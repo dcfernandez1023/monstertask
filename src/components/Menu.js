@@ -39,10 +39,16 @@ function Menu(props) {
 					<Row>
 						<Col>
 							{menuDisplay.map((display) => {
+								var displayTemp = display;
 								return (
 									<Nav variant="pills" className="flex-column">
 										<Nav.Item>
-											<Nav.Link eventKey = {display.value}>
+											<Nav.Link 
+												eventKey = {display.value}
+												onSelect = {(displayTemp) => {
+													props.setHomeCategory(display.displayName, display.value);
+												}}
+											>
 												{display.displayName}
 											</Nav.Link>
 										</Nav.Item>

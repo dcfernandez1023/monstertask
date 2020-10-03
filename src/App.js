@@ -61,7 +61,7 @@ function App() {
 					/>
 				</body> 
 				:
-				<body style = {{backgroundImage: "url('dungeon_background.png')"}}>
+				<body style = {{backgroundImage: "url('mossy_bricks.jpg')"}}>
 					<Home signout = {AUTH.signout}/>
 				</body>
 				}

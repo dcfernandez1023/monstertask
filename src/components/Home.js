@@ -16,19 +16,27 @@ import Sidebar from "react-sidebar";
 function Home(props) {
 	
 	const[sideBarOpen, setSideBar] = useState(false);
+	const[currentDisplayName, setCurrentDisplayName] = useState("Goals");
+	const[currentTab, setCurrentTab] = useState("goals");
 	
 	function toggleSideBar() {
 		setSideBar(!sideBarOpen);
 	}
 	
+	function setHomeCategory(displayName, value) {
+		setCurrentDisplayName(displayName);
+		setCurrentTab(value);
+	}
+	
 	return (
 		<Container fluid>
 			<Sidebar
-				sidebar = {<Menu toggleSideBar = {toggleSideBar}/>}
+				sidebar = {<Menu toggleSideBar = {toggleSideBar} setHomeCategory = {setHomeCategory}/>}
 				open = {sideBarOpen}
 				onSetOpen = {toggleSideBar}
 				transitions = {true}
 				shadow = {true}
+				sidebarClassName = "menu-sidebar"
 				styles = {{sidebar: {background: "white" } }}
 			>
 			</Sidebar>
@@ -42,8 +50,10 @@ function Home(props) {
 									<Button 
 										variant = "light" 
 										onClick = {() => {setSideBar(true)}}
-										style = {{backgroundColor: "#BDB76B"}}> 
-										<Image src = "menu_mini.png" fluid/> 
+										//style = {{backgroundColor: "#BDB76B"}}
+										> 
+										{/*<Image src = "menu_mini.png" fluid/>*/}
+										Menu
 									</Button>
 								</Col>
 							</Row>
@@ -65,13 +75,13 @@ function Home(props) {
 			<Row>
 				<Col>
 					<Container fluid>
-						<Row>
-							<Col>
+						<Row style = {{marginTop: "2%"}}>
+							<Col></Col>
+							<Col style = {{textAlign: "center"}}>
+								<h3 style = {{color: "white"}}> {currentDisplayName !== undefined ? currentDisplayName: null} </h3>
 							</Col>
-							<Col style = {{marginTop: "10%", textAlign: "center"}}>
-								<h4 style = {{color: "white"}}> Some content goes here </h4>
-							</Col>
-							<Col>
+							<Col style = {{textAlign: "right"}}>
+								<Button variant = "light"> + </Button>
 							</Col>
 						</Row>
 					</Container>

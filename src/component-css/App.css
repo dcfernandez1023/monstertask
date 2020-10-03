@@ -40,3 +40,8 @@
 html, body, body > div, .App {
   height: 100%;
 }
+
+.menu-sidebar {
+	max-width: 100%;
+	overflow-x: hidden;
+}
