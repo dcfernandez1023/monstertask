@@ -36,3 +36,7 @@
     transform: rotate(360deg);
   }
 }
+
+html, body, body > div, .App {
+  height: 100%;
+}
