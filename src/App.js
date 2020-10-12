@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login.js';
 import Home from './components/Home.js';
+import GoalBuilder from './pages/GoalBuilder.js';
 
 import './component-css/App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -54,17 +55,22 @@ function App() {
 	return(
 		<Router>
 			<Switch>
-				{userInfo === null ?
-				<body style = {{backgroundImage: "url('dungeon_background.png')"}}>
-					<Login 
-						googleSignin = {AUTH.googleSignin}
-					/>
-				</body> 
-				:
-				<body style = {{backgroundImage: "url('mossy_bricks.jpg')"}}>
-					<Home signout = {AUTH.signout}/>
-				</body>
-				}
+				<Route exact path = "/">
+					{userInfo === null ?
+					<body style = {{backgroundImage: "url('dungeon_background.png')"}}>
+						<Login 
+							googleSignin = {AUTH.googleSignin}
+						/>
+					</body> 
+					:
+					<body style = {{backgroundImage: "url('mossy_bricks.jpg')"}}>
+						<Home signout = {AUTH.signout}/>
+					</body>
+					}
+				</Route>
+				<Route exact path = "/goalBuilder">
+					<GoalBuilder/>
+				</Route>
 			</Switch>
 		</Router>
 	);

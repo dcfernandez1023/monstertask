@@ -81,7 +81,7 @@ function Home(props) {
 								<h3 style = {{color: "white"}}> {currentDisplayName !== undefined ? currentDisplayName: null} </h3>
 							</Col>
 							<Col style = {{textAlign: "right"}}>
-								<Button variant = "light"> + </Button>
+								<Button variant = "light" onClick = {() => {window.location.pathname = "/goalBuilder"}}> + </Button>
 							</Col>
 						</Row>
 					</Container>
