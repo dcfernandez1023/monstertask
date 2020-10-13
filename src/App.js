@@ -23,6 +23,7 @@ function App() {
 	//state objects
 	const[userGoals, updateUserGoals] = useState();
 	const[userInfo, setUserInfo] = useState();
+	const[currentGoal, setCurrentGoal] = useState(GOALMODEL.goal);
 	
 	//functions to be called after initial render or updates on the DOM
 	useEffect(() => {
@@ -52,24 +53,32 @@ function App() {
 		AUTH.isUserSignedin(callback);
 	}
 	
+	//sets currentGoal state object when transitioning to goalBuilder to view/edit a goal
+	//currentGoal is initially the model for a new goal, so if user is adding a new goal, then currentGoal will not be changed
+	function setGoal(goal) {
+		setCurrentGoal(goal);
+	}
+	
 	return(
 		<Router>
 			<Switch>
 				<Route exact path = "/">
 					{userInfo === null ?
-					<body style = {{backgroundImage: "url('dungeon_background.png')"}}>
+					<body /*style = {{backgroundImage: "url('dungeon_background.png')"}}*/>
 						<Login 
 							googleSignin = {AUTH.googleSignin}
 						/>
 					</body> 
 					:
-					<body style = {{backgroundImage: "url('mossy_bricks.jpg')"}}>
-						<Home signout = {AUTH.signout}/>
+					<body /*style = {{backgroundImage: "url('mossy_bricks.jpg')"}}*/>
+						<Home signout = {AUTH.signout} setGoal = {setGoal} goalModel = {GOALMODEL.goal}/>
 					</body>
 					}
 				</Route>
 				<Route exact path = "/goalBuilder">
-					<GoalBuilder/>
+					<body /*style = {{backgroundImage: "url('mossy_bricks.jpg')"}}*/>
+						<GoalBuilder signout = {AUTH.signout} goal = {currentGoal}/>
+					</body>
 				</Route>
 			</Switch>
 		</Router>

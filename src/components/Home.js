@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Menu from './Menu.js';
+import MtNavbar from './MtNavbar.js';
+import NewGoalModal from './NewGoalModal.js';
 
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -12,12 +14,14 @@ import Image from 'react-bootstrap/Image';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Sidebar from "react-sidebar";
+import { motion, Toggle } from 'framer-motion';
 
 function Home(props) {
 	
 	const[sideBarOpen, setSideBar] = useState(false);
 	const[currentDisplayName, setCurrentDisplayName] = useState("Goals");
 	const[currentTab, setCurrentTab] = useState("goals");
+	const[goalModalShow, setShow] = useState(false);
 	
 	function toggleSideBar() {
 		setSideBar(!sideBarOpen);
@@ -30,6 +34,7 @@ function Home(props) {
 	
 	return (
 		<Container fluid>
+			<NewGoalModal fields = {props.goalModel.editableFields} show = {goalModalShow} setShow = {setShow}/>
 			<Sidebar
 				sidebar = {<Menu toggleSideBar = {toggleSideBar} setHomeCategory = {setHomeCategory}/>}
 				open = {sideBarOpen}
@@ -38,38 +43,15 @@ function Home(props) {
 				shadow = {true}
 				sidebarClassName = "menu-sidebar"
 				styles = {{sidebar: {background: "white" } }}
+				
 			>
 			</Sidebar>
 			<Row>
 				<Col>
-					<Navbar fluid collapseOnSelect expand = "md" style = {{backgroundColor: "#BDB76B"}}>
-						{/* TODO: center Navbar.Brand */}
-						<Navbar.Brand> 
-							<Row>
-								<Col>
-									<Button 
-										variant = "light" 
-										onClick = {() => {setSideBar(true)}}
-										//style = {{backgroundColor: "#BDB76B"}}
-										> 
-										{/*<Image src = "menu_mini.png" fluid/>*/}
-										Menu
-									</Button>
-								</Col>
-							</Row>
-						{/*<Image style = {{marginTop: "5%"}} src = "monstertask_med.png" fluid/>*/}
-						</Navbar.Brand>
-						<Navbar.Toggle aria-controls = "responsive-navbar-nav"/>
-						<Navbar.Collapse id = "responsive-navbar-nav">
-							<Nav className = "mr-auto">
-							</Nav>
-							<Nav className = "justify-content-end">
-								<Button variant = "light" onClick = {props.signout}>
-									Logout
-								</Button>
-							</Nav>
-						</Navbar.Collapse>
-					</Navbar>
+					<MtNavbar
+						signout = {props.signout}
+						setSideBar = {setSideBar}
+					/>
 				</Col>
 			</Row>
 			<Row>
@@ -78,10 +60,14 @@ function Home(props) {
 						<Row style = {{marginTop: "2%"}}>
 							<Col></Col>
 							<Col style = {{textAlign: "center"}}>
-								<h3 style = {{color: "white"}}> {currentDisplayName !== undefined ? currentDisplayName: null} </h3>
+								<h3> {currentDisplayName !== undefined ? currentDisplayName: null} </h3>
 							</Col>
 							<Col style = {{textAlign: "right"}}>
-								<Button variant = "light" onClick = {() => {window.location.pathname = "/goalBuilder"}}> + </Button>
+								<Button variant = "light" /*onClick = {() => {window.location.pathname = "/goalBuilder"}}*/
+									onClick = {() => setShow(true)}
+								> 
+									+ 
+								</Button>
 							</Col>
 						</Row>
 					</Container>

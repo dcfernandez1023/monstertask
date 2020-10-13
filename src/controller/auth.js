@@ -18,6 +18,7 @@ export function googleSignin() {
 export function signout(test) {
 	console.log(test);
 	AUTH.signOut().then(function(result) {
+		window.location.pathname = "/";
 		console.log(result);
 	}).catch(function(error) {
 		alert(error.message);

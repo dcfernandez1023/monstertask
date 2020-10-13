@@ -1,5 +1,5 @@
 export const goal = {
-	name: "",
+	name: "New Goal",
 	goalId: "",
 	userCreated: "",
 	dateCreated: "",
@@ -8,10 +8,74 @@ export const goal = {
 	tasks: [],
 	percentageCompleted: 0,
 	description: "",
-	editableFields: ["name", "deadline", "description"],
-	editableFieldsDisplay: ["Name", "Deadline", "Description"],
-	allFieldsDisplay: ["Name", "Goal Id", "User Created", "Date Created", "Date Completed", 
-						"Deadline", "Tasks", "Percentage Completed", "Description"],
-	fieldsSave: ["name", "goalId", "userCreated", "dateCreated", "dateCompleted", "deadline", 
-					"tasks", "percentageCompleted", "description"]
+	sharedWith: [],
+	editableFields: [
+		{
+			value: "name",
+			displayName: "Name",
+			isEditable: true
+		},
+		{
+			value: "deadline",
+			displayName: "Deadline",
+			isEditable: true
+		},
+		{
+			value: "description",
+			displayName: "Description",
+			isEditable: true
+		}
+	],
+	fields: [
+		{
+			value: "name",
+			displayName: "Name",
+			isEditable: true
+		},
+		{
+			value: "deadline",
+			displayName: "Deadline",
+			isEditable: true
+		},
+		{
+			value: "description",
+			displayName: "Description",
+			isEditable: true
+		},
+		{
+			value: "goalId",
+			displayName: "Goal Id",
+			isEditable: false
+		},
+		{
+			value: "userCreated",
+			displayName: "User Created",
+			isEditable: false
+		},
+		{
+			value: "dateCreated",
+			displayName: "Date Created",
+			isEditable: false
+		},
+		{
+			value: "dateCompleted",
+			displayName: "Date Completed",
+			isEditable: false
+		},
+		{
+			value: "tasks",
+			displayName: "Tasks",
+			isEditable: false
+		},
+		{
+			value: "percentageCompleted",
+			displayName: "Percentage Completed",
+			isEditable: false
+		},
+		{
+			value: "sharedWith",
+			displayName: "Shared With",
+			isEditable: false
+		}
+	]
 };
