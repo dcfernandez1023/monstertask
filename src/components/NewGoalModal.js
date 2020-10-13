@@ -61,6 +61,11 @@ function NewGoalModal(props) {
 				<div> </div>
 			}
 			</Modal.Body>
+			<Modal.Footer>
+				<Button variant = "primary">
+					Create
+				</Button>
+			</Modal.Footer>
 		</Modal>
 	);
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Menu from './Menu.js';
 import MtNavbar from './MtNavbar.js';
-import NewGoalModal from './NewGoalModal.js';
+import GoalTab from './GoalTab.js';
 
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -21,7 +21,6 @@ function Home(props) {
 	const[sideBarOpen, setSideBar] = useState(false);
 	const[currentDisplayName, setCurrentDisplayName] = useState("Goals");
 	const[currentTab, setCurrentTab] = useState("goals");
-	const[goalModalShow, setShow] = useState(false);
 	
 	function toggleSideBar() {
 		setSideBar(!sideBarOpen);
@@ -34,7 +33,6 @@ function Home(props) {
 	
 	return (
 		<Container fluid>
-			<NewGoalModal fields = {props.goalModel.editableFields} show = {goalModalShow} setShow = {setShow}/>
 			<Sidebar
 				sidebar = {<Menu toggleSideBar = {toggleSideBar} setHomeCategory = {setHomeCategory}/>}
 				open = {sideBarOpen}
@@ -55,23 +53,13 @@ function Home(props) {
 				</Col>
 			</Row>
 			<Row>
+			{currentTab == "goals" ?
 				<Col>
-					<Container fluid>
-						<Row style = {{marginTop: "2%"}}>
-							<Col></Col>
-							<Col style = {{textAlign: "center"}}>
-								<h3> {currentDisplayName !== undefined ? currentDisplayName: null} </h3>
-							</Col>
-							<Col style = {{textAlign: "right"}}>
-								<Button variant = "light" /*onClick = {() => {window.location.pathname = "/goalBuilder"}}*/
-									onClick = {() => setShow(true)}
-								> 
-									+ 
-								</Button>
-							</Col>
-						</Row>
-					</Container>
+					<GoalTab goalModel = {props.goalModel}/>
 				</Col>
+				:
+				<div></div>
+			}
 			</Row>
 		</Container>
 	);

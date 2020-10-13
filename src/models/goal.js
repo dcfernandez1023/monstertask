@@ -16,13 +16,13 @@ export const goal = {
 			isEditable: true
 		},
 		{
-			value: "deadline",
-			displayName: "Deadline",
+			value: "description",
+			displayName: "Description",
 			isEditable: true
 		},
 		{
-			value: "description",
-			displayName: "Description",
+			value: "deadline",
+			displayName: "Deadline",
 			isEditable: true
 		}
 	],
@@ -33,13 +33,13 @@ export const goal = {
 			isEditable: true
 		},
 		{
-			value: "deadline",
-			displayName: "Deadline",
+			value: "description",
+			displayName: "Description",
 			isEditable: true
 		},
 		{
-			value: "description",
-			displayName: "Description",
+			value: "deadline",
+			displayName: "Deadline",
 			isEditable: true
 		},
 		{
