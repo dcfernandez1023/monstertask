@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Menu from './Menu.js';
 import MtNavbar from './MtNavbar.js';
 import NewGoalModal from './NewGoalModal.js';
+import GoalTab from './GoalTab.js';
 
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -14,7 +15,6 @@ import Image from 'react-bootstrap/Image';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Sidebar from "react-sidebar";
-import { motion, Toggle } from 'framer-motion';
 
 function Home(props) {
 	
@@ -43,7 +43,6 @@ function Home(props) {
 				shadow = {true}
 				sidebarClassName = "menu-sidebar"
 				styles = {{sidebar: {background: "white" } }}
-				
 			>
 			</Sidebar>
 			<Row>
@@ -55,23 +54,13 @@ function Home(props) {
 				</Col>
 			</Row>
 			<Row>
+			{currentTab == "goals" ?
 				<Col>
-					<Container fluid>
-						<Row style = {{marginTop: "2%"}}>
-							<Col></Col>
-							<Col style = {{textAlign: "center"}}>
-								<h3> {currentDisplayName !== undefined ? currentDisplayName: null} </h3>
-							</Col>
-							<Col style = {{textAlign: "right"}}>
-								<Button variant = "light" /*onClick = {() => {window.location.pathname = "/goalBuilder"}}*/
-									onClick = {() => setShow(true)}
-								> 
-									+ 
-								</Button>
-							</Col>
-						</Row>
-					</Container>
+					<GoalTab setShow = {setShow}/>
 				</Col>
+				:
+				<div> </div>
+			}
 			</Row>
 		</Container>
 	);

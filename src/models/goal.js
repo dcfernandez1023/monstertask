@@ -1,5 +1,5 @@
 export const goal = {
-	name: "New Goal",
+	name: "",
 	goalId: "",
 	userCreated: "",
 	dateCreated: "",
