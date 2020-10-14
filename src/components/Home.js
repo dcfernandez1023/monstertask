@@ -55,7 +55,13 @@ function Home(props) {
 			<Row>
 			{currentTab == "goals" ?
 				<Col>
-					<GoalTab goalModel = {props.goalModel}/>
+					<GoalTab 
+						goalModel = {props.goalModel} 
+						goalFields = {props.goalFields} 
+						setGoal = {props.setGoal}
+						writeOne = {props.writeOne}
+						userInfo = {props.userInfo}
+					/>
 				</Col>
 				:
 				<div></div>

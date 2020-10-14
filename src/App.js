@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Login from './components/Login.js';
 import Home from './components/Home.js';
 import GoalBuilder from './pages/GoalBuilder.js';
@@ -62,8 +62,9 @@ function App() {
 	return(
 		<Router>
 			<Switch>
+			{/*TODO: fix glitchy browser back button; the login page gets rendered very briefly*/}
 				<Route exact path = "/">
-					{userInfo === null ?
+					{userInfo === null?
 					<body /*style = {{backgroundImage: "url('dungeon_background.png')"}}*/>
 						<Login 
 							googleSignin = {AUTH.googleSignin}
@@ -71,15 +72,31 @@ function App() {
 					</body> 
 					:
 					<body /*style = {{backgroundImage: "url('mossy_bricks.jpg')"}}*/>
-						<Home signout = {AUTH.signout} setGoal = {setGoal} goalModel = {GOALMODEL.goal}/>
+						<Home 
+							signout = {AUTH.signout} 
+							setGoal = {setGoal} 
+							goalModel = {GOALMODEL.goal} 
+							goalFields = {GOALMODEL.goalFields}
+							userInfo = {userInfo}
+							writeOne = {DB.writeOne}
+						/>
 					</body>
 					}
 				</Route>
-				<Route exact path = "/goalBuilder">
-					<body /*style = {{backgroundImage: "url('mossy_bricks.jpg')"}}*/>
-						<GoalBuilder signout = {AUTH.signout} goal = {currentGoal}/>
-					</body>
-				</Route>
+				<Route 
+					path = "/goalBuilder/:goalId"
+					render = {(props) => 
+						<body /*style = {{backgroundImage: "url('mossy_bricks.jpg')"}}*/>
+							<GoalBuilder 
+								{...props}
+								signout = {AUTH.signout} 
+								writeOne = {DB.writeOne}
+								getQuerey = {DB.getQuerey}
+								{...props}
+							/>
+						</body>
+					}
+				/>
 			</Switch>
 		</Router>
 	);
