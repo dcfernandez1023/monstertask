@@ -11,23 +11,27 @@ function NewGoalModal(props) {
 	
 	const[fields, setFields] = useState([]);
 	const[show, setShow] = useState(false);
+	const[newGoal, setNewGoal] = useState({});
 	
 	useEffect(() => {
-		setFields(props.fields);
+		console.log("updating");
+		setFields(props.fields.editableFields);
 		setShow(props.show);
-	});
+		setNewGoal(props.goalModel);
+	}, [props.show, props.fields, props.goalModel]);
 	
 	function handleClose() {
 		props.setShow(!props.show);
+		setNewGoal({});
 	}
 	
 	function onChangeInput(e) {
 		const name = [e.target.name][0];
 		const value = e.target.value;
-		var fieldsCopy = fields;
-		//var fieldsCopy = JSON.parse(JSON.stringify(fields));
-		fieldsCopy[name] = value;
-		setFields(fieldsCopy);
+		var goalCopy = JSON.parse(JSON.stringify(newGoal));
+		console.log(goalCopy);
+		goalCopy[name] = value;
+		setNewGoal(goalCopy);
 	}
 	
 	return (
@@ -41,7 +45,7 @@ function NewGoalModal(props) {
 				<Modal.Title> Create New Goal </Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-			{fields !== null && fields !== undefined ?
+			{newGoal !== null && newGoal !== undefined && fields !== null && fields !== undefined ?
 				fields.map((field, index) => {
 					return (
 						<Row>
@@ -50,7 +54,7 @@ function NewGoalModal(props) {
 								<Form.Control
 									as = "input"
 									name = {field.value}
-									value = {fields[index][field.value]}
+									value = {newGoal[field.value]}
 									onChange = {(e) => onChangeInput(e)}
 								/>
 							</Col>
@@ -62,7 +66,7 @@ function NewGoalModal(props) {
 			}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant = "primary">
+				<Button variant = "primary" onClick = {() => props.createGoal(newGoal)}>
 					Create
 				</Button>
 			</Modal.Footer>

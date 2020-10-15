@@ -8,7 +8,9 @@ export const goal = {
 	tasks: [],
 	percentageCompleted: 0,
 	description: "",
-	sharedWith: [],
+	sharedWith: []
+}
+export const goalFields = {
 	editableFields: [
 		{
 			value: "name",
@@ -16,30 +18,30 @@ export const goal = {
 			isEditable: true
 		},
 		{
-			value: "deadline",
-			displayName: "Deadline",
-			isEditable: true
-		},
-		{
 			value: "description",
 			displayName: "Description",
 			isEditable: true
+		},
+		{
+			value: "deadline",
+			displayName: "Deadline",
+			isEditable: true
 		}
 	],
-	fields: [
+	allFields: [
 		{
 			value: "name",
 			displayName: "Name",
 			isEditable: true
 		},
 		{
-			value: "deadline",
-			displayName: "Deadline",
+			value: "description",
+			displayName: "Description",
 			isEditable: true
 		},
 		{
-			value: "description",
-			displayName: "Description",
+			value: "deadline",
+			displayName: "Deadline",
 			isEditable: true
 		},
 		{

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Menu from './Menu.js';
 import MtNavbar from './MtNavbar.js';
-import NewGoalModal from './NewGoalModal.js';
 import GoalTab from './GoalTab.js';
 
 import Button from 'react-bootstrap/Button';
@@ -21,7 +20,6 @@ function Home(props) {
 	const[sideBarOpen, setSideBar] = useState(false);
 	const[currentDisplayName, setCurrentDisplayName] = useState("Goals");
 	const[currentTab, setCurrentTab] = useState("goals");
-	const[goalModalShow, setShow] = useState(false);
 	
 	function toggleSideBar() {
 		setSideBar(!sideBarOpen);
@@ -34,7 +32,6 @@ function Home(props) {
 	
 	return (
 		<Container fluid>
-			<NewGoalModal fields = {props.goalModel.editableFields} show = {goalModalShow} setShow = {setShow}/>
 			<Sidebar
 				sidebar = {<Menu toggleSideBar = {toggleSideBar} setHomeCategory = {setHomeCategory}/>}
 				open = {sideBarOpen}
@@ -56,10 +53,16 @@ function Home(props) {
 			<Row>
 			{currentTab == "goals" ?
 				<Col>
-					<GoalTab setShow = {setShow}/>
+					<GoalTab 
+						goalModel = {props.goalModel} 
+						goalFields = {props.goalFields} 
+						setGoal = {props.setGoal}
+						writeOne = {props.writeOne}
+						userInfo = {props.userInfo}
+					/>
 				</Col>
 				:
-				<div> </div>
+				<div></div>
 			}
 			</Row>
 		</Container>
