@@ -45,7 +45,7 @@ function GoalBuilder(props) {
 			subTasks: [
 				{name: "subTask1", description: "yooooooo this is a subtask"}, 
 				{name: "subTask2", description: "yooooooo this is a subtask"}, 
-				{name: "subTask3", description: "yooooooo this is a subtask"}
+	
 			]
 		},
 		{
@@ -126,152 +126,110 @@ function GoalBuilder(props) {
 			</Row>
 			<br/>
 		{goal !== null && goal !== undefined ?
-			<Container fluid>
+			<div>
+				<Row>
+					<Col lg = {2}> </Col>
+					<Col lg = {8}>
+						<Row>
+							<Col>
+								<ProgressBar 
+									now = {100-goal.percentageCompleted} 
+									label = {(100-goal.percentageCompleted).toString() + "%"} 
+									variant = "danger"
+									style = {{height: "30px"}}
+								/>
+							</Col>
+						</Row>
+						<Row>
+							<Col>
+								<h3> {goal.name} </h3>
+							</Col>
+							<Col>
+								<p> ⏲️ <Badge pill variant = "light"> {goal.deadline} </Badge> </p>
+							</Col>
+						</Row>
+						<Row>
+							<Col>
+								<p style = {{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}> 💬 <i> {goal.description} </i> </p>
+							</Col>
+							<Col>
+								<p> 👤 {goal.userCreated} </p>
+							</Col>
+						</Row>
+					</Col>
+				</Row>
+				<Row style = {{marginBottom: "1%"}}>
+					<Col>
+						<Button variant = "light" style = {{float: "left", marginRight: "1%"}}> 
+							+
+						</Button>
+						<h5 style = {{marginTop: "0.5%"}}>
+							📝 Tasks 
+						</h5>
+					</Col>
+					<Col lg = {2}> </Col>
+				</Row>
 				<Row>
 					<Col>
-						<Card style = {{border: "none"}}>
-							<Card.Header>
-								<Row>
-									<Col>
-										<Row style = {{marginBottom: "0.5%"}}>
-											<Col>
-												{goal !== null && goal !== undefined ? goal.name: null}
-											</Col>
-										</Row>
-										<Row>
-											<Col>
-												<Badge pill variant = "light"> Deadline: {goal.deadline} </Badge>
-											</Col>
-										</Row>
-									</Col>
-									<Col style = {{textAlign: "right"}}>
-										<Dropdown style = {{marginLeft: "1%"}}>
-											<Dropdown.Toggle className = "my-dropdown-toggle" variant = "light">
-											</Dropdown.Toggle>
-											<Dropdown.Menu>
-											{GOALOPTIONS.map((option) => {
-												return (
-													<Dropdown.Item> {option.displayName} </Dropdown.Item>
-												);
-											})}
-											</Dropdown.Menu>
-										</Dropdown>
-									</Col>
-								</Row>
-							</Card.Header>
-							<Card.Body>
-								<Row>
-									<Col md = {5}>
-										<Row>
-											<Col xs = {1}>
-												💬
-											</Col>
-											<Col xs = {11}>
-												<p>
-													<i> {goal.description} </i>
-												</p>
-											</Col>
-										</Row>
-										<Row>
-											<Col xs = {1}>
-												👤
-											</Col>
-											<Col xs = {11}>
-												<p> {goal.userCreated} </p>
-											</Col>
-										</Row>
-										<Row>
-											<Col xs = {1}>
-												❤️
-											</Col>
-											<Col xs = {11}>
-												<ProgressBar 
-													now = {100-goal.percentageCompleted} 
-													label = {(100-goal.percentageCompleted).toString() + "%"} 
-													variant = "danger"
-													style = {{height: "30px"}}
-												/>
-											</Col>
-										</Row>
-									</Col>
-									<Col md= {7} style = {{textAlign: "center"}}>
-										<h5> *goal analytics section* </h5>
-									</Col>
-								</Row>
-								<br/>
-								<Row>
-									<Col>
-										<h5> 📝 Tasks </h5>
-									</Col>
-								</Row>
-
-								<Row>
-									<Col>
-										<Row>
-											{testTasks.map((task) => {
-												return (
-													<Col md = {3}>
-														<Card style = {{marginBottom: "5%"}}>
-															<Card.Header> 
-																<Row>
-																	<Col sm = {3}>
-																		{task.name}
-																	</Col>
-																	<Col sm = {3}>
-																		<Badge pills variant = "dark"> Due: {task.deadline} </Badge>
-																	</Col>
-																	<Col sm = {6} style = {{textAlign: "right"}}>
-																		<Dropdown>
-																			<Dropdown.Toggle className = "my-dropdown-toggle" variant = "light">
-																			</Dropdown.Toggle>
-																			<Dropdown.Menu>
-																			{GOALOPTIONS.map((option) => {
-																				return (
-																					<Dropdown.Item> {option.displayName} </Dropdown.Item>
-																				);
-																			})}
-																			</Dropdown.Menu>
-																		</Dropdown>					
-																	</Col>
-																</Row>
-																<Row>
-																	<Col>
-																		{task.percentageCompleted}% completed
-																	</Col>
-																</Row>
-																<Row>
-																	<Col>
-																		<div style = {{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>
-																			<i> {task.description} </i>
-																		</div>
-																	</Col>
-																</Row>
-															</Card.Header>
-															<ListGroup variant = "flush">
-																{task.subTasks.map((sub) => {
-																	return (
-																		<ListGroup.Item>
-																			<Row>
-																				<Col>
-																					<Form.Check
-																						type = "checkbox"
-																						label = {sub.name}
-																					/>
-																				</Col>
-																			</Row>
-																		</ListGroup.Item>
-																	);
-																})}
-															</ListGroup>
-														</Card>
+						<Row>
+							{testTasks.map((task) => {
+								return (
+									<Col xl = {4}>
+										<Card style = {{marginBottom: "5%"}}>
+											<Card.Header> 
+												<Row>
+													<Col>
+														{task.name}
+														<Dropdown style = {{float: "right", height: "50%"}}>
+															<Dropdown.Toggle className = "my-dropdown-toggle" variant = "light">
+															</Dropdown.Toggle>
+															<Dropdown.Menu>
+															{GOALOPTIONS.map((option) => {
+																return (
+																	<Dropdown.Item> {option.displayName} </Dropdown.Item>
+																);
+															})}
+															</Dropdown.Menu>
+														</Dropdown>	
 													</Col>
-												);
-											})}
-										</Row>
+												</Row>
+												<Row>
+													<Col>
+														<div style = {{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>
+															<i> {task.description} </i>
+														</div>
+													</Col>
+												</Row>
+												<Row>
+													<Col>
+														<Badge pills variant = "dark"> Due: {task.deadline} </Badge>
+													</Col>
+												</Row>
+											</Card.Header>
+											<ListGroup variant = "flush">
+												{task.subTasks.map((sub) => {
+													return (
+														<ListGroup.Item>
+															<Row>
+																<Col>
+																	<Form.Check
+																		type = "checkbox"
+																		label = {sub.name}
+																	/>
+																</Col>
+															</Row>
+														</ListGroup.Item>
+													);
+												})}
+											</ListGroup>
+											<Card.Footer>
+												<small className = "text-muted"> {task.percentageCompleted}% completed </small>
+											</Card.Footer>
+										</Card>
 									</Col>
-								</Row>
-							</Card.Body>
-						</Card>
+								);
+							})}
+						</Row>
 					</Col>
 				</Row>
 				{/*
@@ -317,7 +275,7 @@ function GoalBuilder(props) {
 					</Col>
 				</Row>
 				*/}
-			</Container>
+			</div>
 			:
 			<Row>
 				<Col>
