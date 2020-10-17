@@ -8,7 +8,9 @@ export const goal = {
 	tasks: [],
 	percentageCompleted: 0,
 	description: "",
-	sharedWith: []
+	sharedWith: [],
+	chatRoomMessages: [],
+	lastUpdated: ""
 }
 export const goalFields = {
 	editableFields: [
@@ -77,6 +79,11 @@ export const goalFields = {
 		{
 			value: "sharedWith",
 			displayName: "Shared With",
+			isEditable: false
+		},
+		{
+			value: "chatRoomMessages",
+			displayName: "Chat Room Messages",
 			isEditable: false
 		}
 	]

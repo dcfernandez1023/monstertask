@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import MtNavbar from '../components/MtNavbar.js';
 
+import '../component-css/GoalBuilder.css';
+
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
@@ -24,6 +26,11 @@ function GoalBuilder(props) {
 		{value: "details", displayName: "Details"},
 		{value: "share", displayName: "Share"},
 		{value: "delete", displayName: "Delete"}
+	];
+	const TASKOPTIONS = [
+		{value: "edit", displayName: "Edit"},
+		{value: "delete", displayName: "Delete"},
+		{value: "completeAllSubtasks", displayName: "Complete All Sub-tasks"}
 	];
 	const testTasks = [
 		{
@@ -128,34 +135,78 @@ function GoalBuilder(props) {
 		{goal !== null && goal !== undefined ?
 			<div>
 				<Row>
-					<Col lg = {2}> </Col>
+					<Col lg = {4}>
+						<Row>
+							<Col>
+								<Row>
+									<Col>
+										<h3> 	
+											{goal.name} 
+											<Button variant = "light" style = {{marginLeft: "0.5%"}} size = "sm"> ⚙️ </Button>
+										</h3>
+									</Col>
+									{/*
+									<Col>
+										<Dropdown>
+											<Dropdown.Toggle variant = "light" size = "sm">
+												⚙️
+											</Dropdown.Toggle>
+											<Dropdown.Menu>
+											{GOALOPTIONS.map((option) => {
+												return (
+													<Dropdown.Item> {option.displayName} </Dropdown.Item>
+												);
+											})}
+											</Dropdown.Menu>
+										</Dropdown>
+									</Col>
+									*/}
+								</Row>
+								<Row>
+									<Col>
+										<p>
+											❤ 											
+											<Badge pills>
+												<ProgressBar 
+													now = {100-goal.percentageCompleted} 
+													label = {(100-goal.percentageCompleted).toString() + "%"} 
+													variant = "danger"
+													style = {{width: "150px"}}
+												/>
+											</Badge>
+										</p>
+									</Col>
+								</Row>
+								<Row>
+									<Col>
+										<p> ⏲️ <Badge pill variant = "light"> {goal.deadline} </Badge> </p>
+									</Col>
+								</Row>
+								<Row>
+									<Col>
+										<p> 💬 <i> {goal.description} </i> </p>
+									</Col>
+								</Row>
+								<Row>
+									<Col>
+										<p> 👤 {goal.userCreated} </p>
+									</Col>
+								</Row>
+							</Col>
+						</Row>
+					</Col>
 					<Col lg = {8}>
-						<Row>
-							<Col>
-								<ProgressBar 
-									now = {100-goal.percentageCompleted} 
-									label = {(100-goal.percentageCompleted).toString() + "%"} 
-									variant = "danger"
-									style = {{height: "30px"}}
-								/>
-							</Col>
-						</Row>
-						<Row>
-							<Col>
-								<h3> {goal.name} </h3>
-							</Col>
-							<Col>
-								<p> ⏲️ <Badge pill variant = "light"> {goal.deadline} </Badge> </p>
-							</Col>
-						</Row>
-						<Row>
-							<Col>
-								<p style = {{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}> 💬 <i> {goal.description} </i> </p>
-							</Col>
-							<Col>
-								<p> 👤 {goal.userCreated} </p>
-							</Col>
-						</Row>
+						<Card>
+							<Card.Header> Chat Room </Card.Header>
+							<Card.Body>
+								<Card.Title>
+									*in progress!* 
+								</Card.Title>
+							</Card.Body>
+							<Card.Footer>
+								<small> Last Active: </small>
+							</Card.Footer>
+						</Card>
 					</Col>
 				</Row>
 				<Row style = {{marginBottom: "1%"}}>
@@ -167,7 +218,7 @@ function GoalBuilder(props) {
 							📝 Tasks 
 						</h5>
 					</Col>
-					<Col lg = {2}> </Col>
+					<Col lg = {1}> </Col>
 				</Row>
 				<Row>
 					<Col>
@@ -184,7 +235,7 @@ function GoalBuilder(props) {
 															<Dropdown.Toggle className = "my-dropdown-toggle" variant = "light">
 															</Dropdown.Toggle>
 															<Dropdown.Menu>
-															{GOALOPTIONS.map((option) => {
+															{TASKOPTIONS.map((option) => {
 																return (
 																	<Dropdown.Item> {option.displayName} </Dropdown.Item>
 																);
@@ -232,49 +283,6 @@ function GoalBuilder(props) {
 						</Row>
 					</Col>
 				</Row>
-				{/*
-				<Row>
-					<Col sm = {4}>
-						<Row>
-							<h2> {goal !== null && goal !== undefined ? goal.name: null} </h2>
-							<Dropdown style = {{marginLeft: "1%"}}>
-								<Dropdown.Toggle className = "my-dropdown-toggle" variant = "light">
-									&#8942;
-								</Dropdown.Toggle>
-								<Dropdown.Menu>
-								{GOALOPTIONS.map((option) => {
-									return (
-										<Dropdown.Item> {option.displayName} </Dropdown.Item>
-									);
-								})}
-								</Dropdown.Menu>
-							</Dropdown>
-						</Row>
-						<Row>
-							<div 
-								style = {{marginLeft: "1%", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}
-							> 
-								<i> {goal.description} </i>
-							</div>
-						</Row>
-						<Row>
-							<h6> <Badge pill variant = "light"> Due: {goal.deadline} </Badge> </h6>
-						</Row>
-						<Row>
-							<Col>
-							<ProgressBar 
-								now = {100-goal.percentageCompleted} 
-								label = {(100-goal.percentageCompleted).toString() + "%"} 
-								variant = "danger"
-								style = {{height: "30px"}}
-							/>
-							</Col>
-						</Row>
-					</Col>
-					<Col sm = {8}>
-					</Col>
-				</Row>
-				*/}
 			</div>
 			:
 			<Row>

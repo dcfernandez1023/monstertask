@@ -65,7 +65,7 @@ function App() {
 			{/*TODO: fix glitchy browser back button; the login page gets rendered very briefly*/}
 				<Route exact path = "/">
 					{userInfo === null?
-					<body /*style = {{backgroundImage: "url('dungeon_background.png')"}}*/>
+					<body style = {{backgroundImage: "url('dungeon_background.png')"}}>
 						<Login 
 							googleSignin = {AUTH.googleSignin}
 						/>
@@ -79,6 +79,7 @@ function App() {
 							goalFields = {GOALMODEL.goalFields}
 							userInfo = {userInfo}
 							writeOne = {DB.writeOne}
+							getQuerey = {DB.getQuerey}
 						/>
 					</body>
 					}

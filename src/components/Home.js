@@ -59,6 +59,7 @@ function Home(props) {
 						setGoal = {props.setGoal}
 						writeOne = {props.writeOne}
 						userInfo = {props.userInfo}
+						getQuerey = {props.getQuerey}
 					/>
 				</Col>
 				:
