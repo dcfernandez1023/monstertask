@@ -14,18 +14,18 @@ import Sidebar from "react-sidebar";
 
 function MtNavbar(props) {
 	/*TODO: make this component more customizable through the use of props */
-	function setSideBar() {
-		if(props.setSideBar === null || props.setSideBar === undefined) {
+	function leftButtonClick() {
+		if(props.leftButtonClick === undefined) {
 			return;
 		}
-		props.setSideBar(true);
+		props.leftButtonClick();
 	}
 	
-	function signout() {
-		if(props.signout === null || props.signout === undefined) {
+	function rightButtonClick() {
+		if(props.rightButtonClick === undefined) {
 			return;
 		}
-		props.signout();
+		props.rightButtonClick();
 	}
 	
 	return (
@@ -36,11 +36,9 @@ function MtNavbar(props) {
 						<Col>
 							<Button 
 								variant = "light" 
-								onClick = {() => {setSideBar()}}
-								//style = {{backgroundColor: "#BDB76B"}}
+								onClick = {leftButtonClick}
 								> 
-								{/*<Image src = "menu_mini.png" fluid/>*/}
-								Menu
+									{props.leftButtonValue}
 							</Button>
 						</Col>
 					</Row>
@@ -51,8 +49,8 @@ function MtNavbar(props) {
 					<Nav className = "mr-auto">
 					</Nav>
 					<Nav className = "justify-content-end">
-						<Button variant = "light" onClick = {signout}>
-							Logout
+						<Button variant = "light" onClick = {rightButtonClick}>
+							{props.rightButtonValue}
 						</Button>
 					</Nav>
 				</Navbar.Collapse>

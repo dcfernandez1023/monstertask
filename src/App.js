@@ -16,6 +16,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 const DB = require('./controller/db.js');
 const GOALMODEL = require('./models/goal.js');
+const TASKMODEL = require('./models/task.js');
 const AUTH = require('./controller/auth.js');
 
 function App() {
@@ -74,7 +75,6 @@ function App() {
 					<body /*style = {{backgroundImage: "url('mossy_bricks.jpg')"}}*/>
 						<Home 
 							signout = {AUTH.signout} 
-							setGoal = {setGoal} 
 							goalModel = {GOALMODEL.goal} 
 							goalFields = {GOALMODEL.goalFields}
 							userInfo = {userInfo}
@@ -93,6 +93,8 @@ function App() {
 								signout = {AUTH.signout} 
 								writeOne = {DB.writeOne}
 								getQuerey = {DB.getQuerey}
+								taskModel = {TASKMODEL.task}
+								taskFields = {TASKMODEL.taskFields}
 								{...props}
 							/>
 						</body>

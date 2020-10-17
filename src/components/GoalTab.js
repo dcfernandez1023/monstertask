@@ -29,10 +29,10 @@ function GoalTab(props) {
 		props.writeOne(newGoal.goalId, newGoal, "goals", 
 			function(res, data){
 				console.log(res);
-				props.setGoal(newGoal);
 				window.location.pathname = "/goalBuilder/" + data.goalId.toString();
 			},
 			function(error) {
+				//TODO: handle this error more elegantly
 				alert(error.toString());
 			}
 		);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Menu from './Menu.js';
-import MtNavbar from './MtNavbar.js';
 import GoalTab from './GoalTab.js';
+import MtNavbar from './MtNavbar.js';
 
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -45,8 +45,10 @@ function Home(props) {
 			<Row>
 				<Col>
 					<MtNavbar
-						signout = {props.signout}
-						setSideBar = {setSideBar}
+						leftButtonClick = {toggleSideBar}
+						rightButtonClick = {props.signout}
+						leftButtonValue = "&#9776;"
+						rightButtonValue = "Logout"
 					/>
 				</Col>
 			</Row>
@@ -56,7 +58,6 @@ function Home(props) {
 					<GoalTab 
 						goalModel = {props.goalModel} 
 						goalFields = {props.goalFields} 
-						setGoal = {props.setGoal}
 						writeOne = {props.writeOne}
 						userInfo = {props.userInfo}
 						getQuerey = {props.getQuerey}

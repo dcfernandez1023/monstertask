@@ -85,6 +85,11 @@ export const goalFields = {
 			value: "chatRoomMessages",
 			displayName: "Chat Room Messages",
 			isEditable: false
+		},
+		{
+			value: "lastUpdated",
+			displayName: "Last Updated",
+			isEditable: false
 		}
 	]
 };

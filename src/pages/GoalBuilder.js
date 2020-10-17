@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import MtNavbar from '../components/MtNavbar.js';
 
 import '../component-css/GoalBuilder.css';
 
@@ -13,10 +12,13 @@ import CardDeck from 'react-bootstrap/CardDeck';
 import CardColumns from 'react-bootstrap/CardColumns';
 import { useParams } from 'react-router';
 import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
 import Spinner from 'react-bootstrap/Spinner';
 import Badge from 'react-bootstrap/Badge';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import ListGroup from 'react-bootstrap/ListGroup';
+import MtNavbar from '../components/MtNavbar.js';
+import TaskModal from '../components/TaskModal.js';
 
 function GoalBuilder(props) {
 	
@@ -102,6 +104,7 @@ function GoalBuilder(props) {
 	];
 	
 	const[goal, setGoal] = useState();
+	const[show, setShow] = useState(false);
 	
 	useEffect(() => {
 		getGoal();
@@ -122,19 +125,47 @@ function GoalBuilder(props) {
 		});
 	}
 	
+	function createNewTask(newTask) {
+		if(goal === undefined || goal === null) {
+			return;
+		}
+		newTask.dateCreated = new Date().toLocaleDateString();
+		goal.tasks.push(newTask);
+		props.writeOne(goal.goalId, goal, "goals", 
+			function(res, data){
+				console.log(res);
+				setShow(false);
+			},
+			function(error) {
+				//TODO: handle this error more elegantly
+				alert(error.toString());
+			}
+		);
+	}
+	
 	return (
 		<Container fluid>
+			<TaskModal 
+				show = {show} 
+				setShow = {setShow} 
+				taskModel = {props.taskModel} 
+				taskFields = {props.taskFields}
+				createTask = {createNewTask}
+			/>
 			<Row>
 				<Col>
 					<MtNavbar
-						signout = {props.signout}
+						leftButtonClick = {() => {window.location.pathname = "/"}}
+						rightButtonClick = {props.signout}
+						leftButtonValue = "🏠"
+						rightButtonValue = "Logout"
 					/>
 				</Col>
 			</Row>
 			<br/>
 		{goal !== null && goal !== undefined ?
 			<div>
-				<Row>
+				<Row style = {{marginBottom: "1%"}}>
 					<Col lg = {4}>
 						<Row>
 							<Col>
@@ -145,22 +176,6 @@ function GoalBuilder(props) {
 											<Button variant = "light" style = {{marginLeft: "0.5%"}} size = "sm"> ⚙️ </Button>
 										</h3>
 									</Col>
-									{/*
-									<Col>
-										<Dropdown>
-											<Dropdown.Toggle variant = "light" size = "sm">
-												⚙️
-											</Dropdown.Toggle>
-											<Dropdown.Menu>
-											{GOALOPTIONS.map((option) => {
-												return (
-													<Dropdown.Item> {option.displayName} </Dropdown.Item>
-												);
-											})}
-											</Dropdown.Menu>
-										</Dropdown>
-									</Col>
-									*/}
 								</Row>
 								<Row>
 									<Col>
@@ -211,7 +226,7 @@ function GoalBuilder(props) {
 				</Row>
 				<Row style = {{marginBottom: "1%"}}>
 					<Col>
-						<Button variant = "light" style = {{float: "left", marginRight: "1%"}}> 
+						<Button variant = "light" style = {{float: "left", marginRight: "1%"}} onClick = {() => setShow(true)}> 
 							+
 						</Button>
 						<h5 style = {{marginTop: "0.5%"}}>
@@ -221,9 +236,14 @@ function GoalBuilder(props) {
 					<Col lg = {1}> </Col>
 				</Row>
 				<Row>
+					{goal.tasks.length === 0 ?
+						<Col style = {{textAlign: "center", marginTop: "1%"}}>
+							<h6> Nothing to see here... Add some tasks! 😃 </h6>
+						</Col>
+					:
 					<Col>
 						<Row>
-							{testTasks.map((task) => {
+							{goal.tasks.map((task, index) => {
 								return (
 									<Col xl = {4}>
 										<Card style = {{marginBottom: "5%"}}>
@@ -280,8 +300,10 @@ function GoalBuilder(props) {
 									</Col>
 								);
 							})}
+						
 						</Row>
 					</Col>
+					}
 				</Row>
 			</div>
 			:
