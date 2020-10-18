@@ -27,7 +27,8 @@ function GoalBuilder(props) {
 		{value: "edit", displayName: "Edit"},
 		{value: "details", displayName: "Details"},
 		{value: "share", displayName: "Share"},
-		{value: "delete", displayName: "Delete"}
+		{value: "delete", displayName: "Delete"},
+		{value: "completeGoal", displayName: "Complete Goal"}
 	];
 	const TASKOPTIONS = [
 		{value: "edit", displayName: "Edit"},
@@ -105,22 +106,27 @@ function GoalBuilder(props) {
 	
 	const[goal, setGoal] = useState();
 	const[show, setShow] = useState(false);
+	const[newSubs, setNewSubs] = useState([]);
 	
 	useEffect(() => {
+		console.log("hello");
 		getGoal();
 	}, []);
 	
 	function getGoal() {
 		props.getQuerey("goalId", ID, "goals").onSnapshot(quereySnapshot => {
 			if(quereySnapshot.docs.length === 1) {
-				setGoal(quereySnapshot.docs[0].data());
+				var userGoal = quereySnapshot.docs[0].data()
+				setGoal(userGoal);
+				trackNewSubs(userGoal);
 			}
 			else if(quereySnapshot.docs.length === 0) {
 				return;
 			}
 			else {
 				//TODO: handle this error more elegantly
-				alert("Error: duplicate ids");
+				console.log("hi");
+				setGoal({});
 			}
 		});
 	}
@@ -141,6 +147,23 @@ function GoalBuilder(props) {
 				alert(error.toString());
 			}
 		);
+	}
+	
+	function trackNewSubs(goal) {
+		if(goal !== undefined && goal !== null) {
+			var tracker = [];
+			for(var i = 0; i < goal.tasks.length; i++) {
+				var newSubTracker = {};
+				newSubTracker.name = "";
+				newSubTracker.isAdding = false;
+				tracker.push(newSubTracker);
+			}
+			setNewSubs(tracker);
+		}
+	}
+	
+	function addSubTask() {
+		
 	}
 	
 	return (
@@ -169,12 +192,22 @@ function GoalBuilder(props) {
 					<Col lg = {4}>
 						<Row>
 							<Col>
-								<Row>
-									<Col>
-										<h3> 	
-											{goal.name} 
-											<Button variant = "light" style = {{marginLeft: "0.5%"}} size = "sm"> ⚙️ </Button>
+								<Row style = {{marginBottom: "1%"}}>
+									<Col sm = {10}>
+										<h3>
+											{goal.name}					 
 										</h3>
+									</Col>
+									<Col sm = {2}>
+										<DropdownButton variant = "light" style = {{float: "right"}} size = "sm">
+											<Dropdown.Header> Goal Options </Dropdown.Header>
+											<Dropdown.Divider />
+											{GOALOPTIONS.map((option) => {
+												return (
+													<Dropdown.Item> {option.displayName} </Dropdown.Item>
+												);
+											})}
+										</DropdownButton>	
 									</Col>
 								</Row>
 								<Row>
@@ -243,7 +276,7 @@ function GoalBuilder(props) {
 					:
 					<Col>
 						<Row>
-							{goal.tasks.map((task, index) => {
+							{goal.tasks.map((task, index) => {	
 								return (
 									<Col xl = {4}>
 										<Card style = {{marginBottom: "5%"}}>
@@ -251,17 +284,18 @@ function GoalBuilder(props) {
 												<Row>
 													<Col>
 														{task.name}
-														<Dropdown style = {{float: "right", height: "50%"}}>
-															<Dropdown.Toggle className = "my-dropdown-toggle" variant = "light">
-															</Dropdown.Toggle>
-															<Dropdown.Menu>
+													</Col>
+													<Col>
+														<DropdownButton variant = "light" size = "sm" style = {{float: "right"}}>
+															<Dropdown.Header> Task Options </Dropdown.Header>
+															<Dropdown.Divider />
 															{TASKOPTIONS.map((option) => {
 																return (
 																	<Dropdown.Item> {option.displayName} </Dropdown.Item>
 																);
 															})}
-															</Dropdown.Menu>
-														</Dropdown>	
+														</DropdownButton>
+														<Button variant = "light" size = "sm" style = {{float: "right"}}> ➕ </Button>
 													</Col>
 												</Row>
 												<Row>
@@ -292,6 +326,55 @@ function GoalBuilder(props) {
 														</ListGroup.Item>
 													);
 												})}
+												<ListGroup.Item> 
+												{newSubs.length === 0 ?
+												<div></div>
+												:
+												<div>
+												{newSubs[index].isAdding ?
+													<Row>
+														<Col xs = {10}>
+															<Form.Control 
+																as = "input"
+																name = "name"
+																value = {newSubs[index].name}
+																onChange = {(e) => {
+																	var copy = newSubs.slice();
+																	copy[index].name = e.target.value;
+																	setNewSubs(copy);
+																}}
+															/>
+														</Col>
+														<Col xs = {2}>
+														{/*TODO: make this check mark button save the subtask as well */}
+															<Button variant = "light" style = {{float: "right"}} onClick = {() => {
+																													var copy = newSubs.slice();
+																													copy[index].isAdding = false;
+																													copy[index].name = "";
+																													setNewSubs(copy);
+																												}}
+															>
+																✔️
+															</Button>
+														</Col>
+													</Row>
+												:
+													<Row>
+														<Col>
+															<Button variant = "light" style = {{width: "100%"}} onClick = {() => {
+																													var copy = newSubs.slice();
+																													copy[index].isAdding = true;
+																													setNewSubs(copy);
+																												}}
+															>
+																+ Add Sub-task
+															</Button>
+														</Col>
+													</Row>
+												}
+												</div>
+												}
+												</ListGroup.Item>
 											</ListGroup>
 											<Card.Footer>
 												<small className = "text-muted"> {task.percentageCompleted}% completed </small>
