@@ -19,6 +19,7 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import ListGroup from 'react-bootstrap/ListGroup';
 import MtNavbar from '../components/MtNavbar.js';
 import TaskModal from '../components/TaskModal.js';
+import InputGroup from 'react-bootstrap/InputGroup';
 
 function GoalBuilder(props) {
 	
@@ -162,8 +163,12 @@ function GoalBuilder(props) {
 		}
 	}
 	
-	function addSubTask() {
-		
+	function addSubTask(subName, index) {
+		if(goal !== undefined && goal !== null) {
+			var copy = JSON.parse(JSON.stringify(goal));
+			copy.tasks[index].subTasks.push();
+			
+		}
 	}
 	
 	return (
@@ -188,7 +193,7 @@ function GoalBuilder(props) {
 			<br/>
 		{goal !== null && goal !== undefined ?
 			<div>
-				<Row style = {{marginBottom: "1%"}}>
+				<Row>
 					<Col lg = {4}>
 						<Row>
 							<Col>
@@ -257,9 +262,10 @@ function GoalBuilder(props) {
 						</Card>
 					</Col>
 				</Row>
-				<Row style = {{marginBottom: "1%"}}>
+				<br/>
+				<Row>
 					<Col>
-						<Button variant = "light" style = {{float: "left", marginRight: "1%"}} onClick = {() => setShow(true)}> 
+						<Button variant = "secondary" style = {{float: "left", marginRight: "1%"}} onClick = {() => setShow(true)}> 
 							+
 						</Button>
 						<h5 style = {{marginTop: "0.5%"}}>
@@ -268,6 +274,7 @@ function GoalBuilder(props) {
 					</Col>
 					<Col lg = {1}> </Col>
 				</Row>
+				<br/>
 				<Row>
 					{goal.tasks.length === 0 ?
 						<Col style = {{textAlign: "center", marginTop: "1%"}}>
@@ -295,7 +302,6 @@ function GoalBuilder(props) {
 																);
 															})}
 														</DropdownButton>
-														<Button variant = "light" size = "sm" style = {{float: "right"}}> ➕ </Button>
 													</Col>
 												</Row>
 												<Row>
@@ -333,29 +339,74 @@ function GoalBuilder(props) {
 												<div>
 												{newSubs[index].isAdding ?
 													<Row>
-														<Col xs = {10}>
-															<Form.Control 
-																as = "input"
-																name = "name"
-																value = {newSubs[index].name}
-																onChange = {(e) => {
-																	var copy = newSubs.slice();
-																	copy[index].name = e.target.value;
-																	setNewSubs(copy);
-																}}
-															/>
-														</Col>
-														<Col xs = {2}>
-														{/*TODO: make this check mark button save the subtask as well */}
-															<Button variant = "light" style = {{float: "right"}} onClick = {() => {
-																													var copy = newSubs.slice();
-																													copy[index].isAdding = false;
-																													copy[index].name = "";
-																													setNewSubs(copy);
-																												}}
-															>
-																✔️
-															</Button>
+														<Col>
+															<Row>
+																<Col>
+																	<Form.Control 
+																		as = "input"
+																		name = "name"
+																		value = {newSubs[index].name}
+																		onChange = {(e) => {
+																			var copy = newSubs.slice();
+																			copy[index].name = e.target.value;
+																			setNewSubs(copy);
+																		}}
+																		style = {{height: "75%"}}
+																		placeholder = "Sub-task Name"
+																	/>
+																</Col>
+															</Row>
+															<Row>
+																<Col xs = {1}>
+																	📅
+																</Col>
+																<Col xs = {11}>
+																	<Form.Control 
+																		as = "input"
+																		name = "deadline"
+																		style = {{height: "75%", border: "none"}}
+																		placeholder = "Deadline"
+																	/>
+																</Col>
+															</Row>
+															<Row>
+																<Col xs = {1}>
+																	💬
+																</Col>
+																<Col xs = {11}>
+																	<Form.Control
+																		as = "input"
+																		name = "description"
+																		style = {{height: "75%", border: "none"}}
+																		placeholder = "Description"
+																	/>
+																</Col>
+															</Row>
+															<Row style = {{textAlign: "center"}}>
+																<Col>
+																	<Button variant = "light" size = "sm" style = {{float: "center", margin: "1%"}} onClick = {() => {
+																															var copy = newSubs.slice();
+																															copy[index].isAdding = false;
+																															copy[index].name = "";
+																															setNewSubs(copy);
+																														}}
+																	>
+																		❌
+																	</Button>														
+																</Col>
+																<Col>
+																	{/*TODO: make this check mark button save the subtask as well */}
+																	<Button variant = "light" size = "sm" style = {{float: "center", margin: "1%"}} onClick = {() => {
+																															var copy = newSubs.slice();
+																															copy[index].isAdding = false;
+																															copy[index].name = "";
+																															setNewSubs(copy);
+																														}}
+																	>
+																		✔️
+																	</Button>	
+																</Col>
+															</Row>
 														</Col>
 													</Row>
 												:
