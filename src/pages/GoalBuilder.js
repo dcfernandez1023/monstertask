@@ -262,12 +262,17 @@ function GoalBuilder(props) {
 													return (
 														<ListGroup.Item>
 															<Row>
-																<Col>
+																<Col xs = {10}>
 																	<Form.Check
 																		type = "checkbox"
 																		label = {sub.name}
 																	/>
 																</Col>
+																<Col xs = {2}>
+																	<Badge pills variant = "light"> 
+																		⏲️ {sub.deadline}
+																	</Badge>
+																</Col> 
 															</Row>
 														</ListGroup.Item>
 													);
