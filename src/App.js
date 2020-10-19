@@ -17,6 +17,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 const DB = require('./controller/db.js');
 const GOALMODEL = require('./models/goal.js');
 const TASKMODEL = require('./models/task.js');
+const SUBTASKMODEL = require('./models/subTask.js');
 const AUTH = require('./controller/auth.js');
 
 function App() {
@@ -95,6 +96,8 @@ function App() {
 								getQuerey = {DB.getQuerey}
 								taskModel = {TASKMODEL.task}
 								taskFields = {TASKMODEL.taskFields}
+								subTaskModel = {SUBTASKMODEL.subTask}
+								subTaskFields = {SUBTASKMODEL.subTaskFields}
 								{...props}
 							/>
 						</body>

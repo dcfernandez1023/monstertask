@@ -46,7 +46,6 @@ function TaskModal(props) {
 			<Modal.Body>
 			{newTask !== null && newTask !== undefined && taskFields !== null && taskFields !== undefined ?
 				taskFields.map((field, index) => {
-					console.log(field);
 					return (
 						<Row>
 							<Col>
