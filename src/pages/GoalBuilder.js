@@ -20,6 +20,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import MtNavbar from '../components/MtNavbar.js';
 import SubTaskModal from '../components/SubTaskModal.js';
 import TaskModal from '../components/TaskModal.js';
+import DeleteModal from '../components/DeleteModal.js';
 import InputGroup from 'react-bootstrap/InputGroup';
 
 function GoalBuilder(props) {
@@ -44,6 +45,11 @@ function GoalBuilder(props) {
 	const[newSub, setNewSub] = useState();
 	const[newSubIndex, setNewSubIndex] = useState(-1);
 	const[subToEdit, setSubToEdit] = useState();
+	const[subToEditLocation, setSubToEditLocation] = useState({taskIndex: -1, subIndex: -1});
+	const[deleteShow, setDeleteShow] = useState(false);
+	const[modalTitle, setModalTitle] = useState();
+	const[deletePrompt, setDeletePrompt] = useState();
+	
 	
 	useEffect(() => {
 		console.log("hello");
@@ -104,7 +110,7 @@ function GoalBuilder(props) {
 			copy.tasks[index].subTasks.push(newSub);
 			props.writeOne(goal.goalId, copy, "goals",
 				function(res, data) {
-					setGoal(data);
+					//setGoal(data);
 				},
 				function(error) {
 					//TODO: handle this error more elegantly
@@ -112,6 +118,38 @@ function GoalBuilder(props) {
 				}
 			);
 		}
+		else {
+			//TODO: handle this error more elegantly
+			alert("Could not add sub-task");
+		}
+	}
+	
+	function editSubTask(sub, taskIndex, subIndex) {
+		if(sub === undefined || sub === null) {
+			//TODO: handle this error more elegantly
+			alert("Could not add sub-task");
+		}
+		else {
+			var copy = JSON.parse(JSON.stringify(goal));
+			copy.tasks[taskIndex].subTasks[subIndex] = sub;
+			props.writeOne(goal.goalId, copy, "goals",
+				function(res, data) {
+					//setGoal(data);
+				},
+				function(error) {
+					//TODO: handle this error more elegantly
+					alert(error.toString());
+				}
+			);
+		}
+	}
+	
+	function onClickYes(callback) {
+		callback();
+	}
+	
+	function onClickNo(callback) {
+		callback();
 	}
 	
 	return (
@@ -128,6 +166,16 @@ function GoalBuilder(props) {
 				setShow = {setSubShow}
 				sub = {subToEdit}
 				fields = {props.subTaskFields}
+				subLocation = {subToEditLocation}
+				editSub = {editSubTask}
+			/>
+			<DeleteModal
+				show = {deleteShow}
+				setShow = {setDeleteShow}
+				modalTitle = {modalTitle}
+				bodyPrompt = {deletePrompt}
+				onClickYes = {onClickYes}
+				onClickNo = {onClickNo}
 			/>
 			<Row>
 				<Col>
@@ -267,7 +315,7 @@ function GoalBuilder(props) {
 												</Row>
 											</Card.Header>
 											<ListGroup variant = "flush">
-												{task.subTasks.map((sub) => {
+												{task.subTasks.map((sub, subIndex) => {
 													return (
 														<ListGroup.Item>
 															<Row>
@@ -296,9 +344,19 @@ function GoalBuilder(props) {
 																		onClick = {() => {
 																			setSubShow(true);
 																			setSubToEdit(sub);
+																			var copy = subToEditLocation;
+																			copy.taskIndex = index;
+																			copy.subIndex = subIndex;
 																		}}
 																	> 
 																		✏️ 
+																	</Button>
+																	<Button 
+																		variant = "outline-dark"
+																		size = "sm"
+																		style = {{marginTop: "5%"}}
+																	>
+																		🗑️
 																	</Button>
 																</Col>
 															</Row>

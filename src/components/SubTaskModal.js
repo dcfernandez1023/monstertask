@@ -12,12 +12,14 @@ function SubTaskModal(props) {
 	const[fields, setFields] = useState([]);
 	const[show, setShow] = useState(false);
 	const[sub, setSub] = useState(null);
+	const[subLocation, setSubLocation] = useState();
 	
 	useEffect(() => {
 		setFields(props.fields.editableFields);
 		setShow(props.show);
 		setSub(props.sub);
-	}, [props.show, props.sub, props.fields]);
+		setSubLocation(props.subLocation);
+	}, [props.show, props.sub, props.fields, props.subLocation]);
 	
 	function handleClose() {
 		props.setShow(!props.show);
@@ -43,9 +45,8 @@ function SubTaskModal(props) {
 				<Modal.Title> Edit Sub-task </Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-			{sub !== undefined && sub !== null && fields !== null && fields !== undefined ?
+			{sub !== undefined && sub !== null && fields !== null && fields !== undefined && subLocation !== undefined && subLocation !== null ?
 				fields.map((field) => {
-					console.log(sub[field.value]);
 					return (
 						<Row>
 							<Col>
@@ -65,7 +66,11 @@ function SubTaskModal(props) {
 			}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant = "primary"> 
+				<Button variant = "primary" onClick = {() => {
+														props.editSub(sub, subLocation.taskIndex, subLocation.subIndex);
+														handleClose();
+													}}
+				> 
 					Done 
 				</Button>
 			</Modal.Footer>
