@@ -18,6 +18,7 @@ import Badge from 'react-bootstrap/Badge';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import ListGroup from 'react-bootstrap/ListGroup';
 import MtNavbar from '../components/MtNavbar.js';
+import SubTaskModal from '../components/SubTaskModal.js';
 import TaskModal from '../components/TaskModal.js';
 import InputGroup from 'react-bootstrap/InputGroup';
 
@@ -39,8 +40,10 @@ function GoalBuilder(props) {
 	
 	const[goal, setGoal] = useState();
 	const[show, setShow] = useState(false);
+	const[subShow, setSubShow] = useState(false);
 	const[newSub, setNewSub] = useState();
 	const[newSubIndex, setNewSubIndex] = useState(-1);
+	const[subToEdit, setSubToEdit] = useState();
 	
 	useEffect(() => {
 		console.log("hello");
@@ -119,6 +122,12 @@ function GoalBuilder(props) {
 				taskModel = {props.taskModel} 
 				taskFields = {props.taskFields}
 				createTask = {createNewTask}
+			/>
+			<SubTaskModal
+				show = {subShow}
+				setShow = {setSubShow}
+				sub = {subToEdit}
+				fields = {props.subTaskFields}
 			/>
 			<Row>
 				<Col>
@@ -262,17 +271,36 @@ function GoalBuilder(props) {
 													return (
 														<ListGroup.Item>
 															<Row>
-																<Col xs = {10}>
-																	<Form.Check
-																		type = "checkbox"
-																		label = {sub.name}
-																	/>
+																<Col xs = {8}>
+																		<Form.Check
+																			type = "checkbox"
+																			style = {{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}
+																			label = {sub.name + "fdjklsfjskldjfklfjsldkfjkdlsjflksdjfklsjfldskjfsldfjdslkfjslkfjsdlfjslfjsdlfjsdlkfjsdlkfsjdfsdjfds"}
+																		/>
 																</Col>
-																<Col xs = {2}>
+																<Col xs = {4} style = {{textAlign: "right"}}>
 																	<Badge pills variant = "light"> 
 																		⏲️ {sub.deadline}
 																	</Badge>
 																</Col> 
+															</Row>
+															<Row>
+																<Col xs = {8}>
+																	<p> <i> {sub.description} </i> </p> 
+																</Col>
+																<Col xs = {4} style = {{textAlign: "right"}}>
+																	<Button 
+																		variant = "outline-dark" 
+																		size = "sm" 
+																		style = {{marginTop: "5%"}}
+																		onClick = {() => {
+																			setSubShow(true);
+																			setSubToEdit(sub);
+																		}}
+																	> 
+																		✏️ 
+																	</Button>
+																</Col>
 															</Row>
 														</ListGroup.Item>
 													);
@@ -340,7 +368,7 @@ function GoalBuilder(props) {
 															<Row>
 																<Col>
 																	<Button variant = "light" size = "sm" style = {{float: "right", margin: "1%"}} onClick = {() => {
-																															setNewSub({});
+																															setNewSub(props.subTaskModel);
 																															setNewSubIndex(-1);
 																														}}
 																	>
@@ -351,7 +379,7 @@ function GoalBuilder(props) {
 																	{/*TODO: make this check mark button save the subtask as well */}
 																	<Button variant = "light" size = "sm" style = {{float: "left", margin: "1%"}} onClick = {() => {
 																															addSubTask(index)
-																															setNewSub({});
+																															setNewSub(props.subTaskModel);
 																															setNewSubIndex(-1);
 																														}}
 																	>
