@@ -46,9 +46,9 @@ function GoalBuilder(props) {
 	const[newSubIndex, setNewSubIndex] = useState(-1);
 	const[subToEdit, setSubToEdit] = useState();
 	const[subToEditLocation, setSubToEditLocation] = useState({taskIndex: -1, subIndex: -1});
-	const[deleteShow, setDeleteShow] = useState(false);
+	const[deleteSubShow, setDeleteSubShow] = useState(false);
 	const[modalTitle, setModalTitle] = useState();
-	const[deletePrompt, setDeletePrompt] = useState();
+	const[deletePrompt, setDeletePrompt] = useState();	
 	
 	
 	useEffect(() => {
@@ -134,7 +134,6 @@ function GoalBuilder(props) {
 			copy.tasks[taskIndex].subTasks[subIndex] = sub;
 			props.writeOne(goal.goalId, copy, "goals",
 				function(res, data) {
-					//setGoal(data);
 				},
 				function(error) {
 					//TODO: handle this error more elegantly
@@ -144,12 +143,30 @@ function GoalBuilder(props) {
 		}
 	}
 	
-	function onClickYes(callback) {
-		callback();
+	function deleteSubTask(taskIndex, subIndex) {
+		if(taskIndex === -1 && subIndex === -1) {
+			//TODO: handle this error more elegantly
+			alert("Could not delete sub-task");
+		}
+		var copy = JSON.parse(JSON.stringify(goal));
+		copy.tasks[taskIndex].subTasks.splice(subIndex, 1);
+		console.log(copy.tasks[taskIndex].subTasks);
+		props.writeOne(goal.goalId, copy, "goals",
+			function(res, data) {
+			},
+			function(error) {
+				//TODO: handle this error more elegantly
+				alert(error.toString());
+			}
+		);
 	}
 	
-	function onClickNo(callback) {
-		callback();
+	function subOnClickYes() {
+		alert("YOO");
+	}
+	
+	function subOnClickNo() {
+		setDeleteSubShow(false);
 	}
 	
 	return (
@@ -167,15 +184,18 @@ function GoalBuilder(props) {
 				sub = {subToEdit}
 				fields = {props.subTaskFields}
 				subLocation = {subToEditLocation}
+				setSubLocation = {setSubToEditLocation}
 				editSub = {editSubTask}
 			/>
 			<DeleteModal
-				show = {deleteShow}
-				setShow = {setDeleteShow}
+				show = {deleteSubShow}
+				setShow = {setDeleteSubShow}
 				modalTitle = {modalTitle}
 				bodyPrompt = {deletePrompt}
-				onClickYes = {onClickYes}
-				onClickNo = {onClickNo}
+				onClickYes = {deleteSubTask}
+				onClickNo = {setDeleteSubShow}
+				subLocation = {subToEditLocation}
+				setSubLocation = {setSubToEditLocation}
 			/>
 			<Row>
 				<Col>
@@ -262,7 +282,7 @@ function GoalBuilder(props) {
 				<br/>
 				<Row>
 					<Col>
-						<Button variant = "secondary" style = {{float: "left", marginRight: "1%"}} onClick = {() => setShow(true)}> 
+						<Button variant = "outline-secondary" style = {{float: "left", marginRight: "1%"}} onClick = {() => setShow(true)}> 
 							+
 						</Button>
 						<h5 style = {{marginTop: "0.5%"}}>
@@ -282,8 +302,8 @@ function GoalBuilder(props) {
 						<Row>
 							{goal.tasks.map((task, index) => {	
 								return (
-									<Col xl = {4}>
-										<Card style = {{marginBottom: "5%"}}>
+									<Col lg = {4}>
+										<Card className = "taskCard">
 											<Card.Header> 
 												<Row>
 													<Col>
@@ -314,155 +334,163 @@ function GoalBuilder(props) {
 													</Col>
 												</Row>
 											</Card.Header>
-											<ListGroup variant = "flush">
-												{task.subTasks.map((sub, subIndex) => {
-													return (
-														<ListGroup.Item>
-															<Row>
-																<Col xs = {8}>
-																		<Form.Check
-																			type = "checkbox"
-																			style = {{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}
-																			label = {sub.name + "fdjklsfjskldjfklfjsldkfjkdlsjflksdjfklsjfldskjfsldfjdslkfjslkfjsdlfjslfjsdlfjsdlkfjsdlkfsjdfsdjfds"}
+											<Card.Body className = "taskCardBody">
+												<ListGroup variant = "flush">
+													{task.subTasks.map((sub, subIndex) => {
+														return (
+															<ListGroup.Item>
+																<Row>
+																	<Col xs = {8}>
+																			<Form.Check
+																				type = "checkbox"
+																				style = {{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}
+																				label = {sub.name}
+																			/>
+																	</Col>
+																	<Col xs = {4} style = {{textAlign: "right"}}>
+																		<Badge pills variant = "light"> 
+																			⏲️ {sub.deadline}
+																		</Badge>
+																	</Col> 
+																</Row>
+																<Row>
+																	<Col xs = {8}>
+																		<p> <i> {sub.description} </i> </p> 
+																	</Col>
+																	<Col xs = {4} style = {{textAlign: "right"}}>
+																		<Button 
+																			variant = "outline-dark" 
+																			size = "sm" 
+																			style = {{marginTop: "5%"}}
+																			onClick = {() => {
+																				setSubShow(true);
+																				setSubToEdit(sub);
+																				var copy = subToEditLocation;
+																				copy.taskIndex = index;
+																				copy.subIndex = subIndex;
+																			}}
+																		> 
+																			✏️ 
+																		</Button>
+																		<Button 
+																			variant = "outline-dark"
+																			size = "sm"
+																			style = {{marginTop: "5%"}}
+																			onClick = {() => {
+																				setSubToEditLocation({taskIndex: index, subIndex: subIndex});
+																				setDeleteSubShow(true);
+																				setModalTitle("Delete Sub-task");
+																				setDeletePrompt("Are you sure you want to delete sub-task " + "'" + sub.name + "'" + "?");
+																			}}
+																		>
+																			🗑️
+																		</Button>
+																	</Col>
+																</Row>
+															</ListGroup.Item>
+														);
+													})}
+													<ListGroup.Item> 
+													{newSub === undefined || newSub === null ?
+													<div></div>
+													:
+													<div>
+													{newSubIndex === index ?
+														<Row>
+															<Col>
+																<Row>
+																	<Col>
+																		<Form.Control 
+																			as = "input"
+																			name = "name"
+																			value = {newSub.name}
+																			onChange = {(e) => {
+																				var copy = JSON.parse(JSON.stringify(newSub));
+																				copy.name = e.target.value;
+																				setNewSub(copy);
+																			}}
+																			style = {{height: "75%"}}
+																			placeholder = "Sub-task Name"
 																		/>
-																</Col>
-																<Col xs = {4} style = {{textAlign: "right"}}>
-																	<Badge pills variant = "light"> 
-																		⏲️ {sub.deadline}
-																	</Badge>
-																</Col> 
-															</Row>
-															<Row>
-																<Col xs = {8}>
-																	<p> <i> {sub.description} </i> </p> 
-																</Col>
-																<Col xs = {4} style = {{textAlign: "right"}}>
-																	<Button 
-																		variant = "outline-dark" 
-																		size = "sm" 
-																		style = {{marginTop: "5%"}}
-																		onClick = {() => {
-																			setSubShow(true);
-																			setSubToEdit(sub);
-																			var copy = subToEditLocation;
-																			copy.taskIndex = index;
-																			copy.subIndex = subIndex;
-																		}}
-																	> 
-																		✏️ 
-																	</Button>
-																	<Button 
-																		variant = "outline-dark"
-																		size = "sm"
-																		style = {{marginTop: "5%"}}
-																	>
-																		🗑️
-																	</Button>
-																</Col>
-															</Row>
-														</ListGroup.Item>
-													);
-												})}
-												<ListGroup.Item> 
-												{newSub === undefined || newSub === null ?
-												<div></div>
-												:
-												<div>
-												{newSubIndex === index ?
-													<Row>
-														<Col>
-															<Row>
-																<Col>
-																	<Form.Control 
-																		as = "input"
-																		name = "name"
-																		value = {newSub.name}
-																		onChange = {(e) => {
-																			var copy = JSON.parse(JSON.stringify(newSub));
-																			copy.name = e.target.value;
-																			setNewSub(copy);
-																		}}
-																		style = {{height: "75%"}}
-																		placeholder = "Sub-task Name"
-																	/>
-																</Col>
-															</Row>
-															<Row>
-																<Col xs = {1}>
-																	📅
-																</Col>
-																<Col xs = {11}>
-																	<Form.Control 
-																		as = "input"
-																		name = "deadline"
-																		onChange = {(e) => {
-																			var copy = JSON.parse(JSON.stringify(newSub));
-																			copy.deadline = e.target.value;
-																			setNewSub(copy);
-																		}}
-																		style = {{height: "75%", border: "none"}}
-																		placeholder = "Deadline"
-																	/>
-																</Col>
-															</Row>
-															<Row>
-																<Col xs = {1}>
-																	💬
-																</Col>
-																<Col xs = {11}>
-																	<Form.Control
-																		as = "input"
-																		name = "description"
-																		onChange = {(e) => {
-																			var copy = JSON.parse(JSON.stringify(newSub));
-																			copy.description = e.target.value;
-																			setNewSub(copy);
-																		}}
-																		style = {{height: "75%", border: "none"}}
-																		placeholder = "Description"
-																	/>
-																</Col>
-															</Row>
-															<Row>
-																<Col>
-																	<Button variant = "light" size = "sm" style = {{float: "right", margin: "1%"}} onClick = {() => {
-																															setNewSub(props.subTaskModel);
-																															setNewSubIndex(-1);
-																														}}
-																	>
-																		❌
-																	</Button>														
-																</Col>
-																<Col>
-																	{/*TODO: make this check mark button save the subtask as well */}
-																	<Button variant = "light" size = "sm" style = {{float: "left", margin: "1%"}} onClick = {() => {
-																															addSubTask(index)
-																															setNewSub(props.subTaskModel);
-																															setNewSubIndex(-1);
-																														}}
-																	>
-																		✔️
-																	</Button>	
-																</Col>
-															</Row>
-														</Col>
-													</Row>
-												:
-													<Row>
-														<Col>
-															<Button variant = "light" style = {{width: "100%"}} onClick = {() => {
-																													setNewSubIndex(index);
-																												}}
-															>
-																+ Add Sub-task
-															</Button>
-														</Col>
-													</Row>
-												}
-												</div>
-												}
-												</ListGroup.Item>
-											</ListGroup>
+																	</Col>
+																</Row>
+																<Row>
+																	<Col xs = {1}>
+																		📅
+																	</Col>
+																	<Col xs = {11}>
+																		<Form.Control 
+																			as = "input"
+																			name = "deadline"
+																			onChange = {(e) => {
+																				var copy = JSON.parse(JSON.stringify(newSub));
+																				copy.deadline = e.target.value;
+																				setNewSub(copy);
+																			}}
+																			style = {{height: "75%", border: "none"}}
+																			placeholder = "Deadline"
+																		/>
+																	</Col>
+																</Row>
+																<Row>
+																	<Col xs = {1}>
+																		💬
+																	</Col>
+																	<Col xs = {11}>
+																		<Form.Control
+																			as = "input"
+																			name = "description"
+																			onChange = {(e) => {
+																				var copy = JSON.parse(JSON.stringify(newSub));
+																				copy.description = e.target.value;
+																				setNewSub(copy);
+																			}}
+																			style = {{height: "75%", border: "none"}}
+																			placeholder = "Description"
+																		/>
+																	</Col>
+																</Row>
+																<Row>
+																	<Col>
+																		<Button variant = "light" size = "sm" style = {{float: "right", margin: "1%"}} onClick = {() => {
+																																setNewSub(props.subTaskModel);
+																																setNewSubIndex(-1);
+																															}}
+																		>
+																			❌
+																		</Button>														
+																	</Col>
+																	<Col>
+																		{/*TODO: make this check mark button save the subtask as well */}
+																		<Button variant = "light" size = "sm" style = {{float: "left", margin: "1%"}} onClick = {() => {
+																																addSubTask(index)
+																																setNewSub(props.subTaskModel);
+																																setNewSubIndex(-1);
+																															}}
+																		>
+																			✔️
+																		</Button>	
+																	</Col>
+																</Row>
+															</Col>
+														</Row>
+													:
+														<Row>
+															<Col>
+																<Button variant = "light" style = {{width: "100%"}} onClick = {() => {
+																														setNewSubIndex(index);
+																													}}
+																>
+																	+ Add Sub-task
+																</Button>
+															</Col>
+														</Row>
+													}
+													</div>
+													}
+													</ListGroup.Item>
+												</ListGroup>
+											</Card.Body>
 											<Card.Footer>
 												<small className = "text-muted"> {task.percentageCompleted}% completed </small>
 											</Card.Footer>

@@ -12,15 +12,18 @@ function DeleteModal(props) {
 	const[modalTitle, setModalTitle] = useState();
 	const[bodyPrompt, setBodyPrompt] = useState();
 	const[show, setShow] = useState(false);
+	const[subLocation, setSubLocation] = useState();
 	
 	useEffect(() => {
 		setModalTitle(modalTitle);
 		setBodyPrompt(props.bodyPrompt);
 		setShow(props.show);
-	}, [props.modalTitle, props.bodyPrompt, props.show]);
+		setSubLocation(props.subLocation);
+	}, [props.modalTitle, props.bodyPrompt, props.show, props.subLocation]);
 	
 	function handleClose() {
 		props.setShow(!props.show);
+		props.setSubLocation({taskIndex: -1, subIndex: -1});
 	}
 	
 	return (
@@ -29,26 +32,23 @@ function DeleteModal(props) {
 			onHide = {handleClose}
 			backdrop = "static"
 			keyboard = {false}
+			size = "md"
 		>
 			<Modal.Header closeButton>
-				<Modal.Title>
-					{modalTitle === undefined || modalTitle === null ?
-						null
-					:
-						{modalTitle}
-					}
+				<Modal.Title>	
+				{modalTitle}
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 			{bodyPrompt === undefined || bodyPrompt === null ?
 				null
 			:
-				<h5> {bodyPrompt} </h5>
+				<div> {bodyPrompt} </div>
 			}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant = "primary" onClick = {props.onClickYes}> Yes </Button>
-				<Button variant = "secondary" onClick = {props.onClickNo}> No </Button>
+				<Button variant = "primary" onClick = {() => {props.onClickYes(subLocation.taskIndex, subLocation.subIndex); props.setShow(false);}}> Yes </Button>
+				<Button variant = "secondary" onClick = {() => props.onClickNo(false)}> No </Button>
 			</Modal.Footer>
 		</Modal>
 	);

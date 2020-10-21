@@ -23,6 +23,7 @@ function SubTaskModal(props) {
 	
 	function handleClose() {
 		props.setShow(!props.show);
+		props.setSubLocation({taskIndex: -1, subIndex: -1});
 		setSub(null);
 	}
 	
@@ -68,6 +69,7 @@ function SubTaskModal(props) {
 			<Modal.Footer>
 				<Button variant = "primary" onClick = {() => {
 														props.editSub(sub, subLocation.taskIndex, subLocation.subIndex);
+														props.setSubLocation({taskIndex: -1, subIndex: -1});
 														handleClose();
 													}}
 				> 

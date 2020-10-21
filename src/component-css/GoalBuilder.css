@@ -4,3 +4,13 @@ p, h1, h2, h3, h4, h5, h6 {
     white-space: nowrap;
     overflow: hidden;
 }
+
+.taskCardBody {
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.taskCard {
+	max-height: 500px;
+	margin-bottom: 5%;
+}
