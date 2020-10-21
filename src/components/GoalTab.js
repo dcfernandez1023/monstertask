@@ -60,8 +60,11 @@ function GoalTab(props) {
 					fields = {props.goalFields}
 					createGoal = {createNewGoal}
 				/>
+				<Row>
+					<br/>
+				</Row>
 				{userGoals === undefined || userGoals === null ?
-				<Row style = {{marginTop: "2%"}}>
+				<Row style = {{textAlign: "center"}}>
 					<Col>
 						<Spinner 
 							variant = "dark" 

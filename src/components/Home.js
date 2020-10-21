@@ -61,6 +61,7 @@ function Home(props) {
 						writeOne = {props.writeOne}
 						userInfo = {props.userInfo}
 						getQuerey = {props.getQuerey}
+						toggleSideBar = {toggleSideBar}
 					/>
 				</Col>
 				:

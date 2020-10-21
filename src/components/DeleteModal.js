@@ -47,7 +47,7 @@ function DeleteModal(props) {
 			}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant = "primary" onClick = {() => {props.onClickYes(subLocation.taskIndex, subLocation.subIndex); props.setShow(false);}}> Yes </Button>
+				<Button variant = "primary" onClick = {() => {props.onClickYes(subLocation.taskIndex, subLocation.subIndex); handleClose()}}> Yes </Button>
 				<Button variant = "secondary" onClick = {() => props.onClickNo(false)}> No </Button>
 			</Modal.Footer>
 		</Modal>

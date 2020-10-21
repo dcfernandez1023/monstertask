@@ -22,6 +22,7 @@ import SubTaskModal from '../components/SubTaskModal.js';
 import TaskModal from '../components/TaskModal.js';
 import DeleteModal from '../components/DeleteModal.js';
 import InputGroup from 'react-bootstrap/InputGroup';
+import Accordion from 'react-bootstrap/Accordion';
 
 function GoalBuilder(props) {
 	
@@ -49,7 +50,6 @@ function GoalBuilder(props) {
 	const[deleteSubShow, setDeleteSubShow] = useState(false);
 	const[modalTitle, setModalTitle] = useState();
 	const[deletePrompt, setDeletePrompt] = useState();	
-	
 	
 	useEffect(() => {
 		console.log("hello");
@@ -150,7 +150,32 @@ function GoalBuilder(props) {
 		}
 		var copy = JSON.parse(JSON.stringify(goal));
 		copy.tasks[taskIndex].subTasks.splice(subIndex, 1);
-		console.log(copy.tasks[taskIndex].subTasks);
+		props.writeOne(goal.goalId, copy, "goals",
+			function(res, data) {
+			},
+			function(error) {
+				//TODO: handle this error more elegantly
+				alert(error.toString());
+			}
+		);
+	}
+	
+	function completeSub(taskIndex, subIndex) {
+		var copy = JSON.parse(JSON.stringify(goal));
+		copy.tasks[taskIndex].subTasks[subIndex].dateCompleted = new Date().toLocaleDateString();
+		props.writeOne(goal.goalId, copy, "goals",
+			function(res, data) {
+			},
+			function(error) {
+				//TODO: handle this error more elegantly
+				alert(error.toString());
+			}
+		);
+	}
+	
+	function uncompleteSub(taskIndex, subIndex) {
+		var copy = JSON.parse(JSON.stringify(goal));
+		copy.tasks[taskIndex].subTasks[subIndex].dateCompleted = "";
 		props.writeOne(goal.goalId, copy, "goals",
 			function(res, data) {
 			},
@@ -301,6 +326,7 @@ function GoalBuilder(props) {
 					<Col>
 						<Row>
 							{goal.tasks.map((task, index) => {	
+								var completedSubs = [];
 								return (
 									<Col lg = {4}>
 										<Card className = "taskCard">
@@ -337,59 +363,94 @@ function GoalBuilder(props) {
 											<Card.Body className = "taskCardBody">
 												<ListGroup variant = "flush">
 													{task.subTasks.map((sub, subIndex) => {
-														return (
-															<ListGroup.Item>
-																<Row>
-																	<Col xs = {8}>
+														if(sub.dateCompleted.trim().length !== 0) {
+															completedSubs.push(subIndex);
+														}
+														else {
+															return (
+																<ListGroup.Item>
+																	<Row>
+																		<Col xs = {8}>
+																				<Form.Check
+																					type = "checkbox"
+																					style = {{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}
+																					label = {sub.name}
+																					onChange = {() => completeSub(index, subIndex)}
+																				/>
+																		</Col>
+																		<Col xs = {4} style = {{textAlign: "right"}}>
+																			<Badge pills variant = "light"> 
+																				⏲️ {sub.deadline}
+																			</Badge>
+																		</Col> 
+																	</Row>
+																	<Row>
+																		<Col xs = {8}>
+																			<p> <i> {sub.description} </i> </p> 
+																		</Col>
+																		<Col xs = {4} style = {{textAlign: "right"}}>
+																			<Button 
+																				variant = "outline-dark" 
+																				size = "sm" 
+																				style = {{marginTop: "5%"}}
+																				onClick = {() => {
+																					setSubShow(true);
+																					setSubToEdit(sub);
+																					var copy = subToEditLocation;
+																					copy.taskIndex = index;
+																					copy.subIndex = subIndex;
+																				}}
+																			> 
+																				✏️ 
+																			</Button>
+																			<Button 
+																				variant = "outline-dark"
+																				size = "sm"
+																				style = {{marginTop: "5%"}}
+																				onClick = {() => {
+																					setSubToEditLocation({taskIndex: index, subIndex: subIndex});
+																					setDeleteSubShow(true);
+																					setModalTitle("Delete Sub-task");
+																					setDeletePrompt("Are you sure you want to delete sub-task " + "'" + sub.name + "'" + "?");
+																				}}
+																			>
+																				🗑️
+																			</Button>
+																		</Col>
+																	</Row>
+																</ListGroup.Item>
+															);
+														}
+													})}
+													{completedSubs.length !== 0 ?
+													<ListGroup.Item>
+														<Accordion>
+															<Card>
+																<Card.Header>
+																	<Accordion.Toggle as = {Button} variant = "link" eventKey = "0">
+																		<div style = {{color: "black"}}> Completed Subs ✅ </div>
+																	</Accordion.Toggle>
+																</Card.Header>
+																<Accordion.Collapse eventKey = "0">
+																	<Card.Body> 
+																	{completedSubs.map((subIndex) => {
+																		return (
 																			<Form.Check
 																				type = "checkbox"
 																				style = {{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}
-																				label = {sub.name}
+																				label = {<strike> {goal.tasks[index].subTasks[subIndex].name} </strike>}
+																				checked = {true}
+																				onChange = {() => uncompleteSub(index, subIndex)}
 																			/>
-																	</Col>
-																	<Col xs = {4} style = {{textAlign: "right"}}>
-																		<Badge pills variant = "light"> 
-																			⏲️ {sub.deadline}
-																		</Badge>
-																	</Col> 
-																</Row>
-																<Row>
-																	<Col xs = {8}>
-																		<p> <i> {sub.description} </i> </p> 
-																	</Col>
-																	<Col xs = {4} style = {{textAlign: "right"}}>
-																		<Button 
-																			variant = "outline-dark" 
-																			size = "sm" 
-																			style = {{marginTop: "5%"}}
-																			onClick = {() => {
-																				setSubShow(true);
-																				setSubToEdit(sub);
-																				var copy = subToEditLocation;
-																				copy.taskIndex = index;
-																				copy.subIndex = subIndex;
-																			}}
-																		> 
-																			✏️ 
-																		</Button>
-																		<Button 
-																			variant = "outline-dark"
-																			size = "sm"
-																			style = {{marginTop: "5%"}}
-																			onClick = {() => {
-																				setSubToEditLocation({taskIndex: index, subIndex: subIndex});
-																				setDeleteSubShow(true);
-																				setModalTitle("Delete Sub-task");
-																				setDeletePrompt("Are you sure you want to delete sub-task " + "'" + sub.name + "'" + "?");
-																			}}
-																		>
-																			🗑️
-																		</Button>
-																	</Col>
-																</Row>
-															</ListGroup.Item>
-														);
-													})}
+																		);
+																	})}
+																	</Card.Body>
+																</Accordion.Collapse>
+															</Card>
+														</Accordion>
+													</ListGroup.Item>
+													:
+													null}
 													<ListGroup.Item> 
 													{newSub === undefined || newSub === null ?
 													<div></div>
@@ -505,7 +566,7 @@ function GoalBuilder(props) {
 				</Row>
 			</div>
 			:
-			<Row>
+			<Row style = {{textAlign: "center"}}>
 				<Col>
 					<Spinner 
 						animation = "border"
