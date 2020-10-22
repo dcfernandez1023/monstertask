@@ -12,18 +12,20 @@ function DeleteModal(props) {
 	const[modalTitle, setModalTitle] = useState();
 	const[bodyPrompt, setBodyPrompt] = useState();
 	const[show, setShow] = useState(false);
-	const[subLocation, setSubLocation] = useState();
+	const[itemLocation, setItemLocation] = useState({});
+	const[deleteType, setDeleteType] = useState("");
 	
 	useEffect(() => {
 		setModalTitle(modalTitle);
 		setBodyPrompt(props.bodyPrompt);
 		setShow(props.show);
-		setSubLocation(props.subLocation);
-	}, [props.modalTitle, props.bodyPrompt, props.show, props.subLocation]);
+		setItemLocation(props.itemLocation);
+		setDeleteType(props.deleteType);
+	}, [props.modalTitle, props.bodyPrompt, props.show, props.itemLocation, props.deleteType]);
 	
 	function handleClose() {
 		props.setShow(!props.show);
-		props.setSubLocation({taskIndex: -1, subIndex: -1});
+		props.setItemLocation({});
 	}
 	
 	return (
@@ -47,8 +49,8 @@ function DeleteModal(props) {
 			}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant = "primary" onClick = {() => {props.onClickYes(subLocation.taskIndex, subLocation.subIndex); handleClose()}}> Yes </Button>
-				<Button variant = "secondary" onClick = {() => props.onClickNo(false)}> No </Button>
+				<Button variant = "primary" onClick = {() => {props.onClickYes(props.deleteType, -1, itemLocation.taskIndex, itemLocation.subIndex); handleClose()}}> Yes </Button>
+				<Button variant = "secondary" onClick = {() => {props.onClickNo(false)}}> No </Button>
 			</Modal.Footer>
 		</Modal>
 	);

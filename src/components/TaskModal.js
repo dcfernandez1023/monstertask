@@ -11,26 +11,29 @@ function TaskModal(props) {
 	
 	const[taskFields, setFields] = useState([]);
 	const[show, setShow] = useState(false);
-	const[newTask, setNewTask] = useState({});
+	const[task, setTask] = useState({});
+	const[taskIndex, setTaskIndex] = useState();
 	
 	useEffect(() => {
 		setFields(props.taskFields.editableFields);
 		setShow(props.show);
-		setNewTask(props.taskModel);
-	}, [props.show, props.taskFields, props.taskModel]);
+		setTask(props.task);
+		setTaskIndex(props.taskIndex);
+	}, [props.show, props.taskFields, props.taskModel, props.taskIndex]);
 	
 	function handleClose() {
 		props.setShow(!props.show);
-		setNewTask({});
+		setTask({});
+		props.setTask(props.taskModel);
 	}
 	
 	function onChangeInput(e) {
 		const name = [e.target.name][0];
 		const value = e.target.value;
-		var taskCopy = JSON.parse(JSON.stringify(newTask));
+		var taskCopy = JSON.parse(JSON.stringify(task));
 		console.log(taskCopy);
 		taskCopy[name] = value;
-		setNewTask(taskCopy);
+		setTask(taskCopy);
 	}
 	
 	return (
@@ -41,10 +44,10 @@ function TaskModal(props) {
 			keyboard = {false}
 		>
 			<Modal.Header closeButton>
-				<Modal.Title> Create New Task </Modal.Title>
+				<Modal.Title> {props.modalTitle} </Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-			{newTask !== null && newTask !== undefined && taskFields !== null && taskFields !== undefined ?
+			{task !== null && task !== undefined && taskFields !== null && taskFields !== undefined ?
 				taskFields.map((field, index) => {
 					return (
 						<Row>
@@ -53,7 +56,7 @@ function TaskModal(props) {
 								<Form.Control
 									as = "input"
 									name = {field.value}
-									value = {newTask[field.value]}
+									value = {task[field.value]}
 									onChange = {(e) => onChangeInput(e)}
 								/>
 							</Col>
@@ -65,8 +68,12 @@ function TaskModal(props) {
 			}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant = "primary" onClick = {() => props.createTask(newTask)}>
-					Create
+				<Button variant = "primary" onClick = {() => {
+														props.writeTask(task, props.writeMode, taskIndex);
+														handleClose();
+													  }}
+				>
+					{props.buttonValue}
 				</Button>
 			</Modal.Footer>
 		</Modal>

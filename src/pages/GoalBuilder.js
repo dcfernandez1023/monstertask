@@ -42,6 +42,11 @@ function GoalBuilder(props) {
 	
 	const[goal, setGoal] = useState();
 	const[show, setShow] = useState(false);
+	const[onClickTaskModalButton, setTaskModalFunc] = useState();
+	const[task, setTask] = useState();
+	const[taskIndex, setTaskIndex] = useState();
+	const[taskModalTitle, setTaskModalTitle] = useState("");
+	const[taskModalButton, setTaskModalButton] = useState("");
 	const[subShow, setSubShow] = useState(false);
 	const[newSub, setNewSub] = useState();
 	const[newSubIndex, setNewSubIndex] = useState(-1);
@@ -50,10 +55,14 @@ function GoalBuilder(props) {
 	const[deleteSubShow, setDeleteSubShow] = useState(false);
 	const[modalTitle, setModalTitle] = useState();
 	const[deletePrompt, setDeletePrompt] = useState();	
+	const[writeMode, setWriteMode] = useState("");
+	const[deleteType, setDeleteType] = useState("");
+	const[itemLocation, setItemLocation] = useState({});
 	
 	useEffect(() => {
 		console.log("hello");
 		getGoal();
+		setTask(props.taskModel);
 		setNewSub(props.subTaskModel);
 	}, [props.subTaskModel]);
 	
@@ -74,21 +83,37 @@ function GoalBuilder(props) {
 		});
 	}
 	
-	function createNewTask(newTask) {
+	function writeTask(task, writeMode, taskIndex) {
 		if(goal === undefined || goal === null) {
 			return;
 		}
-		newTask.dateCreated = new Date().toLocaleDateString();
-		goal.tasks.push(newTask);
-		props.writeOne(goal.goalId, goal, "goals", 
-			function(res, data){
-				setShow(false);
-			},
-			function(error) {
-				//TODO: handle this error more elegantly
-				alert(error.toString());
-			}
-		);
+		if(writeMode === "create") {
+			task.dateCreated = new Date().toLocaleDateString();
+			task.lastUpdated = new Date().toLocaleDateString();
+			goal.tasks.push(task);
+			props.writeOne(goal.goalId, goal, "goals", 
+				function(res, data){
+					//setShow(false);
+				},
+				function(error) {
+					//TODO: handle this error more elegantly
+					alert(error.toString());
+				}
+			);
+		}
+		else if(writeMode === "edit" && taskIndex !== undefined) {
+			task.lastUpdated = new Date().toLocaleString();
+			goal.tasks[taskIndex] = task;
+			props.writeOne(goal.goalId, goal, "goals", 
+				function(res, data) {
+					//setShow(false);
+				},
+				function(error) {
+					//TODO: handle this error more elegantly
+					alert(error.toString());
+				}
+			);
+		}
 	}
 	
 	function trackNewSubs(goal) {
@@ -186,12 +211,64 @@ function GoalBuilder(props) {
 		);
 	}
 	
-	function subOnClickYes() {
-		alert("YOO");
+	function onSelectTaskOption(key, taskIndex) {
+		if(key === "edit") {
+			setTaskIndex(taskIndex);
+			setTaskModalTitle("Edit Task");
+			setTaskModalButton("Done");
+			setWriteMode("edit");
+			setTask(goal.tasks[taskIndex]);
+			setShow(true);
+		}
+		if(key === "delete") {
+			setTaskIndex(taskIndex);
+			
+		}
 	}
 	
-	function subOnClickNo() {
-		setDeleteSubShow(false);
+	function deleteTask(taskIndex) {
+		if(taskIndex === -1) {
+			//TODO: handle this error more elegantly
+			alert("Could not delete sub-task");
+		}
+		var copy = JSON.parse(JSON.stringify(goal));
+		copy.tasks.splice(taskIndex, 1);
+		props.writeOne(goal.goalId, copy, "goals",
+			function(res, data) {
+			},
+			function(error) {
+				//TODO: handle this error more elegantly
+				alert(error.toString());
+			}
+		);
+	}
+	
+	function onClickYes(deleteType, goalIndex, taskIndex, subIndex) {
+		console.log(deleteType);
+		console.log(goalIndex);
+		console.log(taskIndex);
+		console.log(subIndex);
+		if(deleteType === "subTask" && taskIndex !== undefined && subIndex !== undefined) {
+			deleteSubTask(taskIndex, subIndex);
+		}
+		else if(deleteType === "task" && taskIndex !== undefined) {
+			deleteTask(taskIndex);
+		}
+		else if(deleteType === "goal" && goalIndex !== undefined) {
+			return;
+		}
+	}
+	
+	function onClickNo(deleteType) {
+		if(deleteType === "subTask") {
+			setDeleteSubShow(false);
+		}
+		else if(deleteType === "task") {
+			setShow(false);
+		}
+		else if(deleteType === "goal") {
+			return;
+		}
 	}
 	
 	return (
@@ -199,9 +276,15 @@ function GoalBuilder(props) {
 			<TaskModal 
 				show = {show} 
 				setShow = {setShow} 
-				taskModel = {props.taskModel} 
+				task = {task}
+				taskModel = {props.taskModel}
 				taskFields = {props.taskFields}
-				createTask = {createNewTask}
+				writeTask = {writeTask}
+				modalTitle = {taskModalTitle}
+				buttonValue = {taskModalButton}
+				writeMode = {writeMode}
+				taskIndex = {taskIndex}
+				setTask = {setTask}
 			/>
 			<SubTaskModal
 				show = {subShow}
@@ -215,12 +298,13 @@ function GoalBuilder(props) {
 			<DeleteModal
 				show = {deleteSubShow}
 				setShow = {setDeleteSubShow}
+				deleteType = {deleteType}
 				modalTitle = {modalTitle}
 				bodyPrompt = {deletePrompt}
-				onClickYes = {deleteSubTask}
-				onClickNo = {setDeleteSubShow}
-				subLocation = {subToEditLocation}
-				setSubLocation = {setSubToEditLocation}
+				onClickYes = {onClickYes}
+				onClickNo = {onClickNo}
+				itemLocation = {itemLocation} 
+				setItemLocation = {setItemLocation}
 			/>
 			<Row>
 				<Col>
@@ -307,7 +391,13 @@ function GoalBuilder(props) {
 				<br/>
 				<Row>
 					<Col>
-						<Button variant = "outline-secondary" style = {{float: "left", marginRight: "1%"}} onClick = {() => setShow(true)}> 
+						<Button variant = "outline-secondary" style = {{float: "left", marginRight: "1%"}} onClick = {() => {
+																												setTaskModalTitle("Create New Task");
+																												setTaskModalButton("Create");
+																												setWriteMode("create");
+																												setShow(true);
+																											}}
+						> 
 							+
 						</Button>
 						<h5 style = {{marginTop: "0.5%"}}>
@@ -341,7 +431,12 @@ function GoalBuilder(props) {
 															<Dropdown.Divider />
 															{TASKOPTIONS.map((option) => {
 																return (
-																	<Dropdown.Item> {option.displayName} </Dropdown.Item>
+																	<Dropdown.Item 
+																		eventKey = {option.value}
+																		onSelect = {(key, e) => onSelectTaskOption(key, index)}
+																	> 
+																		{option.displayName} 
+																	</Dropdown.Item>
 																);
 															})}
 														</DropdownButton>
@@ -408,7 +503,8 @@ function GoalBuilder(props) {
 																				size = "sm"
 																				style = {{marginTop: "5%"}}
 																				onClick = {() => {
-																					setSubToEditLocation({taskIndex: index, subIndex: subIndex});
+																					setItemLocation({taskIndex: index, subIndex: subIndex});
+																					setDeleteType("subTask");
 																					setDeleteSubShow(true);
 																					setModalTitle("Delete Sub-task");
 																					setDeletePrompt("Are you sure you want to delete sub-task " + "'" + sub.name + "'" + "?");
@@ -540,6 +636,7 @@ function GoalBuilder(props) {
 															<Col>
 																<Button variant = "light" style = {{width: "100%"}} onClick = {() => {
 																														setNewSubIndex(index);
+																														setTask(props.taskModel);
 																													}}
 																>
 																	+ Add Sub-task
