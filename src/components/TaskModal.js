@@ -19,7 +19,7 @@ function TaskModal(props) {
 		setShow(props.show);
 		setTask(props.task);
 		setTaskIndex(props.taskIndex);
-	}, [props.show, props.taskFields, props.taskModel, props.taskIndex]);
+	}, [props.show, props.taskFields, props.task, props.taskIndex]);
 	
 	function handleClose() {
 		props.setShow(!props.show);

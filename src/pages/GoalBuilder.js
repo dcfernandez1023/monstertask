@@ -41,23 +41,25 @@ function GoalBuilder(props) {
 	];
 	
 	const[goal, setGoal] = useState();
-	const[show, setShow] = useState(false);
-	const[onClickTaskModalButton, setTaskModalFunc] = useState();
+	const[taskShow, setTaskShow] = useState(false);
 	const[task, setTask] = useState();
 	const[taskIndex, setTaskIndex] = useState();
 	const[taskModalTitle, setTaskModalTitle] = useState("");
 	const[taskModalButton, setTaskModalButton] = useState("");
+	
 	const[subShow, setSubShow] = useState(false);
 	const[newSub, setNewSub] = useState();
 	const[newSubIndex, setNewSubIndex] = useState(-1);
 	const[subToEdit, setSubToEdit] = useState();
 	const[subToEditLocation, setSubToEditLocation] = useState({taskIndex: -1, subIndex: -1});
+	
 	const[deleteSubShow, setDeleteSubShow] = useState(false);
-	const[modalTitle, setModalTitle] = useState();
+	const[deleteModalTitle, setDeleteModalTitle] = useState();
 	const[deletePrompt, setDeletePrompt] = useState();	
-	const[writeMode, setWriteMode] = useState("");
 	const[deleteType, setDeleteType] = useState("");
-	const[itemLocation, setItemLocation] = useState({});
+	const[deleteItemLocation, setDeleteItemLocation] = useState({});
+	
+	const[writeMode, setWriteMode] = useState("");
 	
 	useEffect(() => {
 		console.log("hello");
@@ -218,11 +220,15 @@ function GoalBuilder(props) {
 			setTaskModalButton("Done");
 			setWriteMode("edit");
 			setTask(goal.tasks[taskIndex]);
-			setShow(true);
+			setTaskShow(true);
 		}
 		if(key === "delete") {
-			setTaskIndex(taskIndex);
-			
+			setDeleteSubShow(true);
+			setDeleteItemLocation({taskIndex: taskIndex});
+			setDeleteType("task");
+			setDeleteModalTitle("Delete Task");
+			setDeletePrompt("Are you sure you want to delete " + "'" + goal.tasks[taskIndex].name + "'" + "?");
+			//deleteTask(taskIndex);
 		}
 	}
 	
@@ -244,10 +250,6 @@ function GoalBuilder(props) {
 	}
 	
 	function onClickYes(deleteType, goalIndex, taskIndex, subIndex) {
-		console.log(deleteType);
-		console.log(goalIndex);
-		console.log(taskIndex);
-		console.log(subIndex);
 		if(deleteType === "subTask" && taskIndex !== undefined && subIndex !== undefined) {
 			deleteSubTask(taskIndex, subIndex);
 		}
@@ -264,7 +266,7 @@ function GoalBuilder(props) {
 			setDeleteSubShow(false);
 		}
 		else if(deleteType === "task") {
-			setShow(false);
+			setDeleteSubShow(false);
 		}
 		else if(deleteType === "goal") {
 			return;
@@ -274,10 +276,10 @@ function GoalBuilder(props) {
 	return (
 		<Container fluid>
 			<TaskModal 
-				show = {show} 
-				setShow = {setShow} 
+				show = {taskShow} 
+				setShow = {setTaskShow} 
 				task = {task}
-				taskModel = {props.taskModel}
+				//taskModel = {props.taskModel}
 				taskFields = {props.taskFields}
 				writeTask = {writeTask}
 				modalTitle = {taskModalTitle}
@@ -299,12 +301,12 @@ function GoalBuilder(props) {
 				show = {deleteSubShow}
 				setShow = {setDeleteSubShow}
 				deleteType = {deleteType}
-				modalTitle = {modalTitle}
+				deleteModalTitle = {deleteModalTitle}
 				bodyPrompt = {deletePrompt}
 				onClickYes = {onClickYes}
-				onClickNo = {onClickNo}
-				itemLocation = {itemLocation} 
-				setItemLocation = {setItemLocation}
+				onClickNo = {setDeleteSubShow}
+				deleteItemLocation = {deleteItemLocation} 
+				setDeleteItemLocation = {setDeleteItemLocation}
 			/>
 			<Row>
 				<Col>
@@ -395,7 +397,8 @@ function GoalBuilder(props) {
 																												setTaskModalTitle("Create New Task");
 																												setTaskModalButton("Create");
 																												setWriteMode("create");
-																												setShow(true);
+																												setTask(props.taskModel);
+																												setTaskShow(true);
 																											}}
 						> 
 							+
@@ -503,10 +506,10 @@ function GoalBuilder(props) {
 																				size = "sm"
 																				style = {{marginTop: "5%"}}
 																				onClick = {() => {
-																					setItemLocation({taskIndex: index, subIndex: subIndex});
+																					setDeleteItemLocation({taskIndex: index, subIndex: subIndex});
 																					setDeleteType("subTask");
 																					setDeleteSubShow(true);
-																					setModalTitle("Delete Sub-task");
+																					setDeleteModalTitle("Delete Sub-task");
 																					setDeletePrompt("Are you sure you want to delete sub-task " + "'" + sub.name + "'" + "?");
 																				}}
 																			>
@@ -636,7 +639,7 @@ function GoalBuilder(props) {
 															<Col>
 																<Button variant = "light" style = {{width: "100%"}} onClick = {() => {
 																														setNewSubIndex(index);
-																														setTask(props.taskModel);
+																														//setTask(props.taskModel);
 																													}}
 																>
 																	+ Add Sub-task
