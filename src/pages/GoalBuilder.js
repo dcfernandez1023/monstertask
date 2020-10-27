@@ -118,16 +118,18 @@ function GoalBuilder(props) {
 		}
 	}
 	
-	function trackNewSubs(goal) {
-		if(goal !== undefined && goal !== null) {
-			var tracker = [];
-			for(var i = 0; i < goal.tasks.length; i++) {
-				var newSubTracker = {};
-				newSubTracker.name = "";
-				newSubTracker.isAdding = false;
-				tracker.push(newSubTracker);
+	function calculateTaskPercentageCompleted(goalCopy, taskIndex) {
+		var percentageCompleted = 0;
+		var numSubsCompleted = 0;
+		var totalSubs = goalCopy.tasks[taskIndex].subTasks.length;
+		for(var i = 0; i < goalCopy.tasks[taskIndex].subTasks.length; i++) {
+			var sub = goalCopy.tasks[taskIndex].subTasks[i];
+			if(sub.dateCompleted.toString().trim().length !== 0) {
+				numSubsCompleted = numSubsCompleted + 1;
 			}
 		}
+		percentageCompleted = Math.round((numSubsCompleted/totalSubs)*100);	
+		return percentageCompleted;
 	}
 	
 	function addSubTask(index) {
@@ -190,6 +192,7 @@ function GoalBuilder(props) {
 	function completeSub(taskIndex, subIndex) {
 		var copy = JSON.parse(JSON.stringify(goal));
 		copy.tasks[taskIndex].subTasks[subIndex].dateCompleted = new Date().toLocaleDateString();
+		copy.tasks[taskIndex].percentageCompleted = calculateTaskPercentageCompleted(copy, taskIndex);
 		props.writeOne(goal.goalId, copy, "goals",
 			function(res, data) {
 			},
@@ -203,6 +206,7 @@ function GoalBuilder(props) {
 	function uncompleteSub(taskIndex, subIndex) {
 		var copy = JSON.parse(JSON.stringify(goal));
 		copy.tasks[taskIndex].subTasks[subIndex].dateCompleted = "";
+		copy.tasks[taskIndex].percentageCompleted = calculateTaskPercentageCompleted(copy, taskIndex);
 		props.writeOne(goal.goalId, copy, "goals",
 			function(res, data) {
 			},
