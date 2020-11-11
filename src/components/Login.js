@@ -64,6 +64,9 @@ function Login(props) {
 									<Col>
 										<Button variant = "secondary"> Login </Button>
 									</Col>
+									<Col>
+										*non-Google login in progress*
+									</Col>
 								</Row>
 							</div> 
 							:

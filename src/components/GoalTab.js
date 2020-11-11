@@ -80,7 +80,7 @@ function GoalTab(props) {
 							<h3> Goals </h3>
 						</Col>
 						<Col style = {{textAlign: "right"}}>
-							<Button variant = "light" /*onClick = {() => {window.location.pathname = "/goalBuilder"}}*/
+							<Button variant = "outline-dark" /*onClick = {() => {window.location.pathname = "/goalBuilder"}}*/
 								onClick = {() => setShow(true)}
 							> 
 								+ 
@@ -108,7 +108,7 @@ function GoalTab(props) {
 													<Col>
 														<ProgressBar 
 															now = {100-goal.percentageCompleted} 
-															label = {(100-goal.percentageCompleted).toString() + "%"} 
+															label = {100-(goal.percentageCompleted).toString() + "%"} 
 															variant = "danger"
 														/>
 													</Col>

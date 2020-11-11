@@ -122,14 +122,44 @@ function GoalBuilder(props) {
 		var percentageCompleted = 0;
 		var numSubsCompleted = 0;
 		var totalSubs = goalCopy.tasks[taskIndex].subTasks.length;
-		for(var i = 0; i < goalCopy.tasks[taskIndex].subTasks.length; i++) {
+		for(var i = 0; i < totalSubs; i++) {
 			var sub = goalCopy.tasks[taskIndex].subTasks[i];
 			if(sub.dateCompleted.toString().trim().length !== 0) {
-				numSubsCompleted = numSubsCompleted + 1;
+				numSubsCompleted++;
 			}
 		}
 		percentageCompleted = Math.round((numSubsCompleted/totalSubs)*100);	
 		return percentageCompleted;
+	}
+	
+	function calculateGoalPercentageCompleted(goalCopy) {
+		var percentageCompleted = 0;
+		var numSubsCompleted = 0;
+		var totalSubs = 0;
+		for(var i = 0; i < goalCopy.tasks.length; i++) {
+			var task = goalCopy.tasks[i];
+			for(var j = 0; j < task.subTasks.length; j++) {
+				if(task.subTasks[j].dateCompleted.toString().trim().length !== 0) {
+					numSubsCompleted++;
+				}
+				totalSubs++;
+			}
+		}
+		percentageCompleted = Math.round((numSubsCompleted/totalSubs)*100);
+		return percentageCompleted;
+	}
+	
+	function isTaskCompleted(goalCopy, taskIndex) {
+		var isCompleted = true;
+		for(var i = 0; i < goalCopy.tasks[taskIndex].subTasks.length; i++) {
+			if(goalCopy.tasks[taskIndex].subTasks[i].dateCompleted.toString().trim().length === 0) {
+				isCompleted = false;
+				console.log(isCompleted);
+				return isCompleted;
+			}
+		}
+		console.log(isCompleted);
+		return isCompleted;
 	}
 	
 	function addSubTask(index) {
@@ -193,6 +223,10 @@ function GoalBuilder(props) {
 		var copy = JSON.parse(JSON.stringify(goal));
 		copy.tasks[taskIndex].subTasks[subIndex].dateCompleted = new Date().toLocaleDateString();
 		copy.tasks[taskIndex].percentageCompleted = calculateTaskPercentageCompleted(copy, taskIndex);
+		if(isTaskCompleted(copy, taskIndex)) {
+			copy.tasks[taskIndex].dateCompleted = new Date().toLocaleDateString();
+		}
+		copy.percentageCompleted = calculateGoalPercentageCompleted(copy);
 		props.writeOne(goal.goalId, copy, "goals",
 			function(res, data) {
 			},
@@ -207,6 +241,10 @@ function GoalBuilder(props) {
 		var copy = JSON.parse(JSON.stringify(goal));
 		copy.tasks[taskIndex].subTasks[subIndex].dateCompleted = "";
 		copy.tasks[taskIndex].percentageCompleted = calculateTaskPercentageCompleted(copy, taskIndex);
+		if(!isTaskCompleted(copy, taskIndex)) {
+			copy.tasks[taskIndex].dateCompleted = "";
+		}
+		copy.percentageCompleted = calculateGoalPercentageCompleted(copy);
 		props.writeOne(goal.goalId, copy, "goals",
 			function(res, data) {
 			},
@@ -354,7 +392,7 @@ function GoalBuilder(props) {
 											<Badge pills>
 												<ProgressBar 
 													now = {100-goal.percentageCompleted} 
-													label = {(100-goal.percentageCompleted).toString() + "%"} 
+													label = {100-(goal.percentageCompleted).toString() + "%"} 
 													variant = "danger"
 													style = {{width: "150px"}}
 												/>

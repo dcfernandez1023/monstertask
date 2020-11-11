@@ -65,7 +65,9 @@ function Home(props) {
 					/>
 				</Col>
 				:
-				<div></div>
+				<Col style = {{textAlign: "center"}}>
+					<h4> In Progress!!! </h4>
+				</Col>
 			}
 			</Row>
 		</Container>
