@@ -24,6 +24,11 @@ import DeleteModal from '../components/DeleteModal.js';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Accordion from 'react-bootstrap/Accordion';
 
+const DB = require('../controller/db.js');
+const GOALMODEL = require('../models/goal.js');
+const TASKMODEL = require('../models/task.js');
+const SUBTASKMODEL = require('../models/subTask.js');
+
 function GoalBuilder(props) {
 	
 	const ID = props.match.params.goalId;
@@ -41,6 +46,9 @@ function GoalBuilder(props) {
 	];
 	
 	const[goal, setGoal] = useState();
+	const[tasks, setTasks] = useState();
+	const[newTask, setNewTask] = useState();
+	
 	const[taskShow, setTaskShow] = useState(false);
 	const[task, setTask] = useState();
 	const[taskIndex, setTaskIndex] = useState();
@@ -79,10 +87,54 @@ function GoalBuilder(props) {
 			}
 			else {
 				//TODO: handle this error more elegantly
-				console.log("hi");
 				setGoal({});
 			}
 		});
+	}
+	
+	function getTasks() {
+		props.getQuerey("goalId", ID, "tasks").onSnapshot(quereySnapshot => {
+			if(quereySnapshot.docs.length > 0) {
+				var userTasks = quereySnapshot.docs.data();
+				setTasks(userTasks);
+			}
+			else {
+				setTasks([]);
+			}
+		});
+	}
+	
+	function createTask() {
+		newTask.dateCreated = new Date().toLocaleDateString();
+		newTask.lastUpdated = new Date().toLocaleDateString();
+		props.writeOne(ID, newTask, "tasks",
+			function(res, data) {
+				return;
+			},
+			function(error) {
+				////TODO: handle this error more elegantly
+				alert(error.toString());
+			}
+		);
+	}
+	
+	function editTask(taskIndex, editedTask) {
+		editedTask.lastUpdated = new Date().toLocaleDateString();
+		tasks[taskIndex] = editedTask;
+		props.writeOne(ID, editedTask, "tasks", 
+			function(res, data) {
+				//setShow(false);
+			},
+			function(error) {
+				//TODO: handle this error more elegantly
+				alert(error.toString());
+			}
+		);
+	}
+	
+	function deleteTask2(taskIndex) {
+		tasks.splice(taskIndex, 1);
+		
 	}
 	
 	function writeTask(task, writeMode, taskIndex) {

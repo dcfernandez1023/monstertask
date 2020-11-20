@@ -2,11 +2,23 @@ const firebaseApp = require('./firebaseapp.js');
 //TODO: provide callback function parameter that will be called if errors occur
 const DBFS = firebaseApp.app.firestore();
 
-// add/update one piece of data 
+// writes one piece of data to the specified collection
 export function writeOne(id, data, collectionName, callback, callbackOnError) {
 	try {
 		DBFS.collection(collectionName).doc(id).set(data)
 			.then((res) => {callback(res, data)});
+	}
+	catch(error) {
+		callbackOnError(error);
+	}
+}
+
+export function deleteOne(id, collectionName, callback, callbackOnError) {
+	
+	try {
+		var doc = DBFS.collection(collectionName).doc(id);
+		doc.delete()
+			.then((res) => {callback(res)});
 	}
 	catch(error) {
 		callbackOnError(error);

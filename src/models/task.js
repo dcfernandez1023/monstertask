@@ -1,5 +1,8 @@
 export const task = {
 	name: "",
+	taskId: "",
+	parentId: "",
+	userCreated: "",
 	dateCreated: "",
 	dateCompleted: "",
 	deadline: "",
