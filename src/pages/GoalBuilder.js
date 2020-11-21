@@ -17,12 +17,15 @@ import Spinner from 'react-bootstrap/Spinner';
 import Badge from 'react-bootstrap/Badge';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import ListGroup from 'react-bootstrap/ListGroup';
-import MtNavbar from '../components/MtNavbar.js';
-import SubTaskModal from '../components/SubTaskModal.js';
-import TaskModal from '../components/TaskModal.js';
-import DeleteModal from '../components/DeleteModal.js';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Accordion from 'react-bootstrap/Accordion';
+import { v4 as uuidv4} from 'uuid';
+
+import MtNavbar from '../components/MtNavbar.js';
+import CreateTaskModal from '../components/CreateTaskModal.js';
+import EditTaskModal from '../components/EditTaskModal.js';
+import SubTaskModal from '../components/SubTaskModal.js';
+import DeleteModal from '../components/DeleteModal.js';
 
 const DB = require('../controller/db.js');
 const GOALMODEL = require('../models/goal.js');
@@ -30,7 +33,7 @@ const TASKMODEL = require('../models/task.js');
 const SUBTASKMODEL = require('../models/subTask.js');
 
 function GoalBuilder(props) {
-	
+
 	const ID = props.match.params.goalId;
 	const GOALOPTIONS = [
 		{value: "edit", displayName: "Edit"},
@@ -44,40 +47,35 @@ function GoalBuilder(props) {
 		{value: "delete", displayName: "Delete"},
 		{value: "completeTask", displayName: "Complete Task"}
 	];
-	
+
 	const[goal, setGoal] = useState();
-	const[tasks, setTasks] = useState();
-	const[newTask, setNewTask] = useState();
-	
-	const[taskShow, setTaskShow] = useState(false);
-	const[task, setTask] = useState();
-	const[taskIndex, setTaskIndex] = useState();
-	const[taskModalTitle, setTaskModalTitle] = useState("");
-	const[taskModalButton, setTaskModalButton] = useState("");
-	
+	const[tasks, setTasks] = useState([]);
+
+	const[createTaskShow, setCreateTaskShow] = useState(false);
+	const[editTaskShow, setEditTaskShow] = useState(false);
+	const[taskToEdit, setTaskToEdit] = useState();
+	const[taskToDelete, setTaskToDelete] = useState();
+
 	const[subShow, setSubShow] = useState(false);
 	const[newSub, setNewSub] = useState();
 	const[newSubIndex, setNewSubIndex] = useState(-1);
 	const[subToEdit, setSubToEdit] = useState();
+	const[subIndexToDelete, setSubIndexToDelete] = useState(-1);
 	const[subToEditLocation, setSubToEditLocation] = useState({taskIndex: -1, subIndex: -1});
-	
+
 	const[deleteSubShow, setDeleteSubShow] = useState(false);
 	const[deleteModalTitle, setDeleteModalTitle] = useState();
-	const[deletePrompt, setDeletePrompt] = useState();	
+	const[deletePrompt, setDeletePrompt] = useState();
 	const[deleteType, setDeleteType] = useState("");
-	const[deleteItemLocation, setDeleteItemLocation] = useState({});
-	
-	const[writeMode, setWriteMode] = useState("");
-	
+
 	useEffect(() => {
-		console.log("hello");
 		getGoal();
-		setTask(props.taskModel);
+		getTasks();
 		setNewSub(props.subTaskModel);
 	}, [props.subTaskModel]);
-	
+
 	function getGoal() {
-		props.getQuerey("goalId", ID, "goals").onSnapshot(quereySnapshot => {
+		DB.getQuerey("goalId", ID, "goals").onSnapshot(quereySnapshot => {
 			if(quereySnapshot.docs.length === 1) {
 				var userGoal = quereySnapshot.docs[0].data()
 				setGoal(userGoal);
@@ -91,23 +89,31 @@ function GoalBuilder(props) {
 			}
 		});
 	}
-	
+
+	//TASK FUNCTIONS
+
 	function getTasks() {
-		props.getQuerey("goalId", ID, "tasks").onSnapshot(quereySnapshot => {
+		DB.getQuerey("goalId", ID, "tasks").onSnapshot(quereySnapshot => {
+			console.log(quereySnapshot.docs.length);
 			if(quereySnapshot.docs.length > 0) {
-				var userTasks = quereySnapshot.docs.data();
-				setTasks(userTasks);
+				var arr = [];
+				for(var i in quereySnapshot.docs) {
+					arr.push(quereySnapshot.docs[i].data());
+				}
+				setTasks(arr);
 			}
 			else {
 				setTasks([]);
 			}
 		});
 	}
-	
-	function createTask() {
+
+	function createTask(newTask) {
 		newTask.dateCreated = new Date().toLocaleDateString();
 		newTask.lastUpdated = new Date().toLocaleDateString();
-		props.writeOne(ID, newTask, "tasks",
+		newTask.taskId = new Date().getTime().toString() + uuidv4().toString();
+		newTask.goalId = ID;
+		DB.writeOne(newTask.taskId, newTask, "tasks",
 			function(res, data) {
 				return;
 			},
@@ -117,13 +123,12 @@ function GoalBuilder(props) {
 			}
 		);
 	}
-	
-	function editTask(taskIndex, editedTask) {
+
+	function editTask(editedTask) {
 		editedTask.lastUpdated = new Date().toLocaleDateString();
-		tasks[taskIndex] = editedTask;
-		props.writeOne(ID, editedTask, "tasks", 
+		DB.writeOne(editedTask.taskId, editedTask, "tasks",
 			function(res, data) {
-				//setShow(false);
+				return;
 			},
 			function(error) {
 				//TODO: handle this error more elegantly
@@ -131,12 +136,79 @@ function GoalBuilder(props) {
 			}
 		);
 	}
-	
-	function deleteTask2(taskIndex) {
-		tasks.splice(taskIndex, 1);
-		
+
+	function deleteTask2(taskId) {
+		DB.deleteOne(taskId, "tasks",
+			function(res, data) {
+				return;
+			},
+			function(error) {
+				//TODO: handle this error more elegantly
+				alert(error.toString());
+			}
+		);
 	}
-	
+
+	//SUB-TASK FUNCTIONS
+
+	function createSub(task, sub) {
+		sub.dateCreated = new Date().toLocaleDateString();
+		task.lastUpdated = new Date().toLocaleDateString();
+		task.subTasks.push(sub);
+		DB.writeOne(task.taskId, task, "tasks",
+			function(res, data) {
+				return;
+			},
+			function(error) {
+				alert(error.toString());
+			}
+		);
+	}
+
+	function editSub(task, sub, index) {
+		task.lastUpdated = new Date().toLocaleDateString();
+		task.subTasks[index] = sub;
+		DB.writeOne(task.taskId, task, "tasks",
+			function(res, data) {
+				return;
+			},
+			function(error) {
+				alert(error.toString());
+			}
+		);
+	}
+
+	function deleteSub(task, index) {
+		task.lastUpdated = new Date().toLocaleDateString();
+		task.subTasks.splice(index, 1);
+		DB.writeOne(task.taskId, task, "tasks",
+			function(res, data) {
+				return;
+			},
+			function(error) {
+				alert(error.toString());
+			}
+		);
+	}
+
+	function checkSub(task, index) {
+		task.lastUpdated = new Date().toLocaleDateString();
+		if(task.subTasks[index].dateCompleted.trim().length === 0) {
+			task.subTasks[index].dateCompleted = new Date().toLocaleDateString();
+		}
+		else {
+			task.subTasks[index].dateCompleted = "";
+		}
+		DB.writeOne(task.taskId, task, "tasks",
+			function(res, data) {
+				return;
+			},
+			function(error) {
+				alert(error.toString());
+			}
+		);
+	}
+
 	function writeTask(task, writeMode, taskIndex) {
 		if(goal === undefined || goal === null) {
 			return;
@@ -145,7 +217,7 @@ function GoalBuilder(props) {
 			task.dateCreated = new Date().toLocaleDateString();
 			task.lastUpdated = new Date().toLocaleDateString();
 			goal.tasks.push(task);
-			props.writeOne(goal.goalId, goal, "goals", 
+			props.writeOne(goal.goalId, goal, "goals",
 				function(res, data){
 					//setShow(false);
 				},
@@ -158,7 +230,7 @@ function GoalBuilder(props) {
 		else if(writeMode === "edit" && taskIndex !== undefined) {
 			task.lastUpdated = new Date().toLocaleString();
 			goal.tasks[taskIndex] = task;
-			props.writeOne(goal.goalId, goal, "goals", 
+			props.writeOne(goal.goalId, goal, "goals",
 				function(res, data) {
 					//setShow(false);
 				},
@@ -169,7 +241,7 @@ function GoalBuilder(props) {
 			);
 		}
 	}
-	
+
 	function calculateTaskPercentageCompleted(goalCopy, taskIndex) {
 		var percentageCompleted = 0;
 		var numSubsCompleted = 0;
@@ -180,10 +252,10 @@ function GoalBuilder(props) {
 				numSubsCompleted++;
 			}
 		}
-		percentageCompleted = Math.round((numSubsCompleted/totalSubs)*100);	
+		percentageCompleted = Math.round((numSubsCompleted/totalSubs)*100);
 		return percentageCompleted;
 	}
-	
+
 	function calculateGoalPercentageCompleted(goalCopy) {
 		var percentageCompleted = 0;
 		var numSubsCompleted = 0;
@@ -200,7 +272,7 @@ function GoalBuilder(props) {
 		percentageCompleted = Math.round((numSubsCompleted/totalSubs)*100);
 		return percentageCompleted;
 	}
-	
+
 	function isTaskCompleted(goalCopy, taskIndex) {
 		var isCompleted = true;
 		for(var i = 0; i < goalCopy.tasks[taskIndex].subTasks.length; i++) {
@@ -213,7 +285,7 @@ function GoalBuilder(props) {
 		console.log(isCompleted);
 		return isCompleted;
 	}
-	
+
 	function addSubTask(index) {
 		if(goal !== undefined && goal !== null) {
 			newSub.dateCreated = new Date().toLocaleDateString();
@@ -234,7 +306,7 @@ function GoalBuilder(props) {
 			alert("Could not add sub-task");
 		}
 	}
-	
+
 	function editSubTask(sub, taskIndex, subIndex) {
 		if(sub === undefined || sub === null) {
 			//TODO: handle this error more elegantly
@@ -253,7 +325,7 @@ function GoalBuilder(props) {
 			);
 		}
 	}
-	
+
 	function deleteSubTask(taskIndex, subIndex) {
 		if(taskIndex === -1 && subIndex === -1) {
 			//TODO: handle this error more elegantly
@@ -270,7 +342,7 @@ function GoalBuilder(props) {
 			}
 		);
 	}
-	
+
 	function completeSub(taskIndex, subIndex) {
 		var copy = JSON.parse(JSON.stringify(goal));
 		copy.tasks[taskIndex].subTasks[subIndex].dateCompleted = new Date().toLocaleDateString();
@@ -288,7 +360,7 @@ function GoalBuilder(props) {
 			}
 		);
 	}
-	
+
 	function uncompleteSub(taskIndex, subIndex) {
 		var copy = JSON.parse(JSON.stringify(goal));
 		copy.tasks[taskIndex].subTasks[subIndex].dateCompleted = "";
@@ -306,26 +378,21 @@ function GoalBuilder(props) {
 			}
 		);
 	}
-	
-	function onSelectTaskOption(key, taskIndex) {
+
+	function onSelectTaskOption(key, task) {
 		if(key === "edit") {
-			setTaskIndex(taskIndex);
-			setTaskModalTitle("Edit Task");
-			setTaskModalButton("Done");
-			setWriteMode("edit");
-			setTask(goal.tasks[taskIndex]);
-			setTaskShow(true);
+			setTaskToEdit(task);
+			setEditTaskShow(true);
 		}
 		if(key === "delete") {
+			setTaskToDelete(task);
 			setDeleteSubShow(true);
-			setDeleteItemLocation({taskIndex: taskIndex});
 			setDeleteType("task");
 			setDeleteModalTitle("Delete Task");
-			setDeletePrompt("Are you sure you want to delete " + "'" + goal.tasks[taskIndex].name + "'" + "?");
-			//deleteTask(taskIndex);
+			setDeletePrompt("Are you sure you want to delete " + "'" + task.name + "'" + "?");
 		}
 	}
-	
+
 	function deleteTask(taskIndex) {
 		if(taskIndex === -1) {
 			//TODO: handle this error more elegantly
@@ -342,19 +409,19 @@ function GoalBuilder(props) {
 			}
 		);
 	}
-	
-	function onClickYes(deleteType, goalIndex, taskIndex, subIndex) {
-		if(deleteType === "subTask" && taskIndex !== undefined && subIndex !== undefined) {
-			deleteSubTask(taskIndex, subIndex);
+
+	function onClickYes(deleteType, task) {
+		if(deleteType === "subTask") {
+			return;
 		}
-		else if(deleteType === "task" && taskIndex !== undefined) {
-			deleteTask(taskIndex);
+		else if(deleteType === "task") {
+			deleteTask2(task.taskId);
 		}
-		else if(deleteType === "goal" && goalIndex !== undefined) {
+		else if(deleteType === "goal") {
 			return;
 		}
 	}
-	
+
 	function onClickNo(deleteType) {
 		if(deleteType === "subTask") {
 			setDeleteSubShow(false);
@@ -366,21 +433,22 @@ function GoalBuilder(props) {
 			return;
 		}
 	}
-	
+
 	return (
 		<Container fluid>
-			<TaskModal 
-				show = {taskShow} 
-				setShow = {setTaskShow} 
-				task = {task}
-				//taskModel = {props.taskModel}
+			<CreateTaskModal
+				show = {createTaskShow}
+				setShow = {setCreateTaskShow}
+				task = {TASKMODEL.task}
+				createTask = {createTask}
 				taskFields = {props.taskFields}
-				writeTask = {writeTask}
-				modalTitle = {taskModalTitle}
-				buttonValue = {taskModalButton}
-				writeMode = {writeMode}
-				taskIndex = {taskIndex}
-				setTask = {setTask}
+			/>
+			<EditTaskModal
+				show = {editTaskShow}
+				setShow = {setEditTaskShow}
+				task = {taskToEdit}
+				editTask = {editTask}
+				taskFields = {props.taskFields}
 			/>
 			<SubTaskModal
 				show = {subShow}
@@ -394,13 +462,13 @@ function GoalBuilder(props) {
 			<DeleteModal
 				show = {deleteSubShow}
 				setShow = {setDeleteSubShow}
+				taskToDelete = {taskToDelete}
+				subIndexToDelete = {subIndexToDelete}
 				deleteType = {deleteType}
 				deleteModalTitle = {deleteModalTitle}
 				bodyPrompt = {deletePrompt}
 				onClickYes = {onClickYes}
 				onClickNo = {setDeleteSubShow}
-				deleteItemLocation = {deleteItemLocation} 
-				setDeleteItemLocation = {setDeleteItemLocation}
 			/>
 			<Row>
 				<Col>
@@ -422,7 +490,7 @@ function GoalBuilder(props) {
 								<Row style = {{marginBottom: "1%"}}>
 									<Col sm = {10}>
 										<h3>
-											{goal.name}					 
+											{goal.name}
 										</h3>
 									</Col>
 									<Col sm = {2}>
@@ -434,17 +502,17 @@ function GoalBuilder(props) {
 													<Dropdown.Item> {option.displayName} </Dropdown.Item>
 												);
 											})}
-										</DropdownButton>	
+										</DropdownButton>
 									</Col>
 								</Row>
 								<Row>
 									<Col>
 										<p>
-											❤ 											
+											❤
 											<Badge pills>
-												<ProgressBar 
-													now = {100-goal.percentageCompleted} 
-													label = {100-(goal.percentageCompleted).toString() + "%"} 
+												<ProgressBar
+													now = {100-goal.percentageCompleted}
+													label = {100-(goal.percentageCompleted).toString() + "%"}
 													variant = "danger"
 													style = {{width: "150px"}}
 												/>
@@ -475,7 +543,7 @@ function GoalBuilder(props) {
 							<Card.Header> Chat Room </Card.Header>
 							<Card.Body>
 								<Card.Title>
-									*in progress!* 
+									*in progress!*
 								</Card.Title>
 							</Card.Body>
 							<Card.Footer>
@@ -488,36 +556,32 @@ function GoalBuilder(props) {
 				<Row>
 					<Col>
 						<Button variant = "outline-secondary" style = {{float: "left", marginRight: "1%"}} onClick = {() => {
-																												setTaskModalTitle("Create New Task");
-																												setTaskModalButton("Create");
-																												setWriteMode("create");
-																												setTask(props.taskModel);
-																												setTaskShow(true);
+																												setCreateTaskShow(true);
 																											}}
-						> 
+						>
 							+
 						</Button>
 						<h5 style = {{marginTop: "0.5%"}}>
-							📝 Tasks 
+							📝 Tasks
 						</h5>
 					</Col>
 					<Col lg = {1}> </Col>
 				</Row>
 				<br/>
 				<Row>
-					{goal.tasks.length === 0 ?
+					{tasks.length === 0 ?
 						<Col style = {{textAlign: "center", marginTop: "1%"}}>
 							<h6> Nothing to see here... Add some tasks! 😃 </h6>
 						</Col>
 					:
 					<Col>
 						<Row>
-							{goal.tasks.map((task, index) => {	
+							{tasks.map((task, index) => {
 								var completedSubs = [];
 								return (
 									<Col lg = {4}>
 										<Card className = "taskCard">
-											<Card.Header> 
+											<Card.Header>
 												<Row>
 													<Col>
 														{task.name}
@@ -528,11 +592,11 @@ function GoalBuilder(props) {
 															<Dropdown.Divider />
 															{TASKOPTIONS.map((option) => {
 																return (
-																	<Dropdown.Item 
+																	<Dropdown.Item
 																		eventKey = {option.value}
-																		onSelect = {(key, e) => onSelectTaskOption(key, index)}
-																	> 
-																		{option.displayName} 
+																		onSelect = {(key, e) => onSelectTaskOption(key, task)}
+																	>
+																		{option.displayName}
 																	</Dropdown.Item>
 																);
 															})}
@@ -571,19 +635,19 @@ function GoalBuilder(props) {
 																				/>
 																		</Col>
 																		<Col xs = {4} style = {{textAlign: "right"}}>
-																			<Badge pills variant = "light"> 
+																			<Badge pills variant = "light">
 																				⏲️ {sub.deadline}
 																			</Badge>
-																		</Col> 
+																		</Col>
 																	</Row>
 																	<Row>
 																		<Col xs = {8}>
-																			<p> <i> {sub.description} </i> </p> 
+																			<p> <i> {sub.description} </i> </p>
 																		</Col>
 																		<Col xs = {4} style = {{textAlign: "right"}}>
-																			<Button 
-																				variant = "outline-dark" 
-																				size = "sm" 
+																			<Button
+																				variant = "outline-dark"
+																				size = "sm"
 																				style = {{marginTop: "5%"}}
 																				onClick = {() => {
 																					setSubShow(true);
@@ -592,15 +656,16 @@ function GoalBuilder(props) {
 																					copy.taskIndex = index;
 																					copy.subIndex = subIndex;
 																				}}
-																			> 
-																				✏️ 
+																			>
+																				✏️
 																			</Button>
-																			<Button 
+																			<Button
 																				variant = "outline-dark"
 																				size = "sm"
 																				style = {{marginTop: "5%"}}
 																				onClick = {() => {
-																					setDeleteItemLocation({taskIndex: index, subIndex: subIndex});
+																					setSubIndexToDelete(subIndex);
+																					setTaskToDelete(task);
 																					setDeleteType("subTask");
 																					setDeleteSubShow(true);
 																					setDeleteModalTitle("Delete Sub-task");
@@ -625,7 +690,7 @@ function GoalBuilder(props) {
 																	</Accordion.Toggle>
 																</Card.Header>
 																<Accordion.Collapse eventKey = "0">
-																	<Card.Body> 
+																	<Card.Body>
 																	{completedSubs.map((subIndex) => {
 																		return (
 																			<Form.Check
@@ -644,7 +709,7 @@ function GoalBuilder(props) {
 													</ListGroup.Item>
 													:
 													null}
-													<ListGroup.Item> 
+													<ListGroup.Item>
 													{newSub === undefined || newSub === null ?
 													<div></div>
 													:
@@ -654,7 +719,7 @@ function GoalBuilder(props) {
 															<Col>
 																<Row>
 																	<Col>
-																		<Form.Control 
+																		<Form.Control
 																			as = "input"
 																			name = "name"
 																			value = {newSub.name}
@@ -673,7 +738,7 @@ function GoalBuilder(props) {
 																		📅
 																	</Col>
 																	<Col xs = {11}>
-																		<Form.Control 
+																		<Form.Control
 																			as = "input"
 																			name = "deadline"
 																			onChange = {(e) => {
@@ -712,7 +777,7 @@ function GoalBuilder(props) {
 																															}}
 																		>
 																			❌
-																		</Button>														
+																		</Button>
 																	</Col>
 																	<Col>
 																		{/*TODO: make this check mark button save the subtask as well */}
@@ -723,7 +788,7 @@ function GoalBuilder(props) {
 																															}}
 																		>
 																			✔️
-																		</Button>	
+																		</Button>
 																	</Col>
 																</Row>
 															</Col>
@@ -753,7 +818,7 @@ function GoalBuilder(props) {
 									</Col>
 								);
 							})}
-						
+
 						</Row>
 					</Col>
 					}
@@ -762,7 +827,7 @@ function GoalBuilder(props) {
 			:
 			<Row style = {{textAlign: "center"}}>
 				<Col>
-					<Spinner 
+					<Spinner
 						animation = "border"
 						variant = "dark"
 					/>

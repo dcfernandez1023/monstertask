@@ -1,5 +1,6 @@
 export const subTask = {
 	name: "",
+	userCompleted: "",
 	dateCreated: "",
 	dateCompleted: "",
 	deadline: "",
@@ -24,7 +25,7 @@ export const subTaskFields = {
 			isEditable: true
 		}
 	],
-	
+
 	allFields: [
 		{
 			value: "name",

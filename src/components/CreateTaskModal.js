@@ -7,35 +7,32 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 
-function TaskModal(props) {
-	
+function CreateTaskModal(props) {
+
 	const[taskFields, setFields] = useState([]);
 	const[show, setShow] = useState(false);
 	const[task, setTask] = useState({});
 	const[taskIndex, setTaskIndex] = useState();
-	
+
 	useEffect(() => {
 		setFields(props.taskFields.editableFields);
 		setShow(props.show);
 		setTask(props.task);
-		setTaskIndex(props.taskIndex);
 	}, [props.show, props.taskFields, props.task, props.taskIndex]);
-	
+
 	function handleClose() {
 		props.setShow(!props.show);
 		setTask({});
-		props.setTask(props.taskModel);
 	}
-	
+
 	function onChangeInput(e) {
 		const name = [e.target.name][0];
 		const value = e.target.value;
 		var taskCopy = JSON.parse(JSON.stringify(task));
-		console.log(taskCopy);
 		taskCopy[name] = value;
 		setTask(taskCopy);
 	}
-	
+
 	return (
 		<Modal
 			show = {show}
@@ -44,7 +41,7 @@ function TaskModal(props) {
 			keyboard = {false}
 		>
 			<Modal.Header closeButton>
-				<Modal.Title> {props.modalTitle} </Modal.Title>
+				<Modal.Title> Create Task </Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 			{task !== null && task !== undefined && taskFields !== null && taskFields !== undefined ?
@@ -69,15 +66,15 @@ function TaskModal(props) {
 			</Modal.Body>
 			<Modal.Footer>
 				<Button variant = "primary" onClick = {() => {
-														props.writeTask(task, props.writeMode, taskIndex);
-														handleClose();
+														props.createTask(task);
+															handleClose();
 													  }}
 				>
-					{props.buttonValue}
+					Create
 				</Button>
 			</Modal.Footer>
 		</Modal>
 	);
 }
 
-export default TaskModal;
+export default CreateTaskModal;

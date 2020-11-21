@@ -5,11 +5,9 @@ export const goal = {
 	dateCreated: "",
 	dateCompleted: "",
 	deadline: "",
-	tasks: [],
 	percentageCompleted: 0,
 	description: "",
 	sharedWith: [],
-	chatRoomMessages: [],
 	lastUpdated: ""
 }
 export const goalFields = {

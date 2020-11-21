@@ -8,26 +8,23 @@ import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 
 function DeleteModal(props) {
-	
+
 	const[modalTitle, setModalTitle] = useState();
 	const[bodyPrompt, setBodyPrompt] = useState();
 	const[show, setShow] = useState(false);
-	const[deleteItemLocation, setDeleteItemLocation] = useState({});
 	const[deleteType, setDeleteType] = useState("");
-	
+
 	useEffect(() => {
 		setModalTitle(props.deleteModalTitle);
 		setBodyPrompt(props.bodyPrompt);
 		setShow(props.show);
-		setDeleteItemLocation(props.deleteItemLocation);
 		setDeleteType(props.deleteType);
-	}, [props.deleteModalTitle, props.bodyPrompt, props.show, props.deleteItemLocation, props.deleteType]);
-	
+	}, [props.deleteModalTitle, props.bodyPrompt, props.show, props.deleteType]);
+
 	function handleClose() {
 		props.setShow(!props.show);
-		props.setDeleteItemLocation({});
 	}
-	
+
 	return (
 		<Modal
 			show = {show}
@@ -37,7 +34,7 @@ function DeleteModal(props) {
 			size = "md"
 		>
 			<Modal.Header closeButton>
-				<Modal.Title>	
+				<Modal.Title>
 					{modalTitle}
 				</Modal.Title>
 			</Modal.Header>
@@ -49,7 +46,7 @@ function DeleteModal(props) {
 			}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant = "primary" onClick = {() => {props.onClickYes(props.deleteType, deleteItemLocation.goalIndex, deleteItemLocation.taskIndex, deleteItemLocation.subIndex); handleClose()}}> Yes </Button>
+				<Button variant = "primary" onClick = {() => {props.onClickYes(props.deleteType, props.taskToDelete); handleClose()}}> Yes </Button>
 				<Button variant = "secondary" onClick = {() => {props.onClickNo(false)}}> No </Button>
 			</Modal.Footer>
 		</Modal>

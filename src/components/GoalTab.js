@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import NewGoalModal from './NewGoalModal.js';
+import CreateGoalModal from './CreateGoalModal.js';
 
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -12,21 +12,25 @@ import { Link } from 'react-router-dom';
 import Spinner from 'react-bootstrap/Spinner';
 import Badge from 'react-bootstrap/Badge';
 import ProgressBar from 'react-bootstrap/ProgressBar';
+import { v4 as uuidv4} from 'uuid';
+
+const DB = require('../controller/db.js');
+const GOALMODEL = require('../models/goal.js');
 
 function GoalTab(props) {
-	
+
 	const[goalModalShow, setShow] = useState(false);
 	const [userGoals, setUserGoals] = useState();
-	
+
 	useEffect(() => {
 		getUserGoals();
 	}, [props.userInfo]);
-	
+
 	function createNewGoal(newGoal) {
-		newGoal.goalId = new Date().getTime().toString() + props.userInfo.email.toString();
+		newGoal.goalId = new Date().getTime().toString() + uuidv4().toString();
 		newGoal.userCreated = props.userInfo.email;
 		newGoal.dateCreated = new Date().toLocaleDateString();
-		props.writeOne(newGoal.goalId, newGoal, "goals", 
+		props.writeOne(newGoal.goalId, newGoal, "goals",
 			function(res, data){
 				console.log(res);
 				window.location.pathname = "/goalBuilder/" + data.goalId.toString();
@@ -37,26 +41,26 @@ function GoalTab(props) {
 			}
 		);
 	}
-	
+
 	function getUserGoals() {
 		if(props.userInfo === undefined) {
 			return;
 		}
-		props.getQuerey("userCreated", props.userInfo.email, "goals").onSnapshot(quereySnapshot => {
-			var goals = []
+		DB.getQuerey("userCreated", props.userInfo.email, "goals").onSnapshot(quereySnapshot => {
+			var goals = [];
 			for(var i = 0; i < quereySnapshot.docs.length; i++) {
 				goals.push(quereySnapshot.docs[i].data());
 			}
 			setUserGoals(goals);
 		});
 	}
-	
+
 	return (
 		<Container fluid>
-				<NewGoalModal 
-					show = {goalModalShow} 
-					setShow = {setShow} 
-					goalModel = {props.goalModel} 
+				<CreateGoalModal
+					show = {goalModalShow}
+					setShow = {setShow}
+					goalModel = {props.goalModel}
 					fields = {props.goalFields}
 					createGoal = {createNewGoal}
 				/>
@@ -66,8 +70,8 @@ function GoalTab(props) {
 				{userGoals === undefined || userGoals === null ?
 				<Row style = {{textAlign: "center"}}>
 					<Col>
-						<Spinner 
-							variant = "dark" 
+						<Spinner
+							variant = "dark"
 							animation = "border"
 						/>
 					</Col>
@@ -82,8 +86,8 @@ function GoalTab(props) {
 						<Col style = {{textAlign: "right"}}>
 							<Button variant = "outline-dark" /*onClick = {() => {window.location.pathname = "/goalBuilder"}}*/
 								onClick = {() => setShow(true)}
-							> 
-								+ 
+							>
+								+
 							</Button>
 						</Col>
 					</Row>
@@ -94,21 +98,21 @@ function GoalTab(props) {
 									<a style = {{cursor: "pointer"}} onClick = {() => window.location.pathname = "/goalBuilder/"+goal.goalId}>
 										<Card border = "dark">
 											<Card.Img variant = "top" src = "dungeon.png"/>
-											<Card.Body> 
-												<Card.Title as = "h6"> 
+											<Card.Body>
+												<Card.Title as = "h6">
 													{goal.name}
-													<Badge pills variant = "light" style = {{marginLeft: "3%"}}> ⏲️ {goal.deadline} </Badge> 
+													<Badge pills variant = "light" style = {{marginLeft: "3%"}}> ⏲️ {goal.deadline} </Badge>
 													{goal.sharedWith.length === 0 ?
-															<Badge pills variant = "light"> 👥 1 </Badge>									
+															<Badge pills variant = "light"> 👥 1 </Badge>
 														:
-															<Badge pills variant = "light"> 👥 {goal.sharedWith.length+1} </Badge>											
+															<Badge pills variant = "light"> 👥 {goal.sharedWith.length+1} </Badge>
 													}
 												</Card.Title>
 												<Row>
 													<Col>
-														<ProgressBar 
-															now = {100-goal.percentageCompleted} 
-															label = {100-(goal.percentageCompleted).toString() + "%"} 
+														<ProgressBar
+															now = {100-goal.percentageCompleted}
+															label = {100-(goal.percentageCompleted).toString() + "%"}
 															variant = "danger"
 														/>
 													</Col>

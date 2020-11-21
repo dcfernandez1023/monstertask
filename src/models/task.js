@@ -1,8 +1,9 @@
 export const task = {
 	name: "",
 	taskId: "",
-	parentId: "",
+	goalId: "",
 	userCreated: "",
+	userCompleted: "",
 	dateCreated: "",
 	dateCompleted: "",
 	deadline: "",
@@ -30,7 +31,7 @@ export const taskFields = {
 			isEditable: true
 		}
 	],
-	
+
 	allFields: [
 		{
 			value: "name",
@@ -60,7 +61,7 @@ export const taskFields = {
 		{
 			value: "subTasks",
 			displayName: "Sub-tasks",
-			isEditable: false 
+			isEditable: false
 		},
 		{
 			value: "percentageCompleted",

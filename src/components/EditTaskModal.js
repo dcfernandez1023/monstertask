@@ -7,33 +7,32 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 
-function NewGoalModal(props) {
-	
-	const[fields, setFields] = useState([]);
+function EditTaskModal(props) {
+
+	const[taskFields, setFields] = useState([]);
 	const[show, setShow] = useState(false);
-	const[newGoal, setNewGoal] = useState({});
-	
+	const[task, setTask] = useState({});
+	const[taskIndex, setTaskIndex] = useState();
+
 	useEffect(() => {
-		console.log("updating");
-		setFields(props.fields.editableFields);
+		setFields(props.taskFields.editableFields);
 		setShow(props.show);
-		setNewGoal(props.goalModel);
-	}, [props.show, props.fields, props.goalModel]);
-	
+		setTask(props.task);
+	}, [props.show, props.taskFields, props.task, props.taskIndex]);
+
 	function handleClose() {
 		props.setShow(!props.show);
-		setNewGoal({});
+		setTask({});
 	}
-	
+
 	function onChangeInput(e) {
 		const name = [e.target.name][0];
 		const value = e.target.value;
-		var goalCopy = JSON.parse(JSON.stringify(newGoal));
-		console.log(goalCopy);
-		goalCopy[name] = value;
-		setNewGoal(goalCopy);
+		var taskCopy = JSON.parse(JSON.stringify(task));
+		taskCopy[name] = value;
+		setTask(taskCopy);
 	}
-	
+
 	return (
 		<Modal
 			show = {show}
@@ -42,11 +41,11 @@ function NewGoalModal(props) {
 			keyboard = {false}
 		>
 			<Modal.Header closeButton>
-				<Modal.Title> Create New Goal </Modal.Title>
+				<Modal.Title> Edit Task </Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-			{newGoal !== null && newGoal !== undefined && fields !== null && fields !== undefined ?
-				fields.map((field, index) => {
+			{task !== null && task !== undefined && taskFields !== null && taskFields !== undefined ?
+				taskFields.map((field, index) => {
 					return (
 						<Row>
 							<Col>
@@ -54,7 +53,7 @@ function NewGoalModal(props) {
 								<Form.Control
 									as = "input"
 									name = {field.value}
-									value = {newGoal[field.value]}
+									value = {task[field.value]}
 									onChange = {(e) => onChangeInput(e)}
 								/>
 							</Col>
@@ -66,12 +65,16 @@ function NewGoalModal(props) {
 			}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant = "primary" onClick = {() => props.createGoal(newGoal)}>
-					Create
+				<Button variant = "primary" onClick = {() => {
+														props.editTask(task);
+															handleClose();
+													  }}
+				>
+					Done
 				</Button>
 			</Modal.Footer>
 		</Modal>
 	);
 }
 
-export default NewGoalModal;
+export default EditTaskModal;
