@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Menu from './Menu.js';
-import GoalTab from './GoalTab.js';
+import GoalTab from './Goal/GoalTab.js';
 import MtNavbar from './MtNavbar.js';
 
 import Button from 'react-bootstrap/Button';
@@ -16,20 +16,20 @@ import Nav from 'react-bootstrap/Nav';
 import Sidebar from "react-sidebar";
 
 function Home(props) {
-	
+
 	const[sideBarOpen, setSideBar] = useState(false);
 	const[currentDisplayName, setCurrentDisplayName] = useState("Goals");
 	const[currentTab, setCurrentTab] = useState("goals");
-	
+
 	function toggleSideBar() {
 		setSideBar(!sideBarOpen);
 	}
-	
+
 	function setHomeCategory(displayName, value) {
 		setCurrentDisplayName(displayName);
 		setCurrentTab(value);
 	}
-	
+
 	return (
 		<Container fluid>
 			<Sidebar
@@ -55,9 +55,9 @@ function Home(props) {
 			<Row>
 			{currentTab == "goals" ?
 				<Col>
-					<GoalTab 
-						goalModel = {props.goalModel} 
-						goalFields = {props.goalFields} 
+					<GoalTab
+						goalModel = {props.goalModel}
+						goalFields = {props.goalFields}
 						writeOne = {props.writeOne}
 						userInfo = {props.userInfo}
 						getQuerey = {props.getQuerey}

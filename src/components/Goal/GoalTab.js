@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import CreateGoalModal from './CreateGoalModal.js';
 
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -14,8 +13,10 @@ import Badge from 'react-bootstrap/Badge';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { v4 as uuidv4} from 'uuid';
 
-const DB = require('../controller/db.js');
-const GOALMODEL = require('../models/goal.js');
+import CreateGoalModal from './CreateGoalModal.js';
+
+const DB = require('../../controller/db.js');
+const GOALMODEL = require('../../models/goal.js');
 
 function GoalTab(props) {
 

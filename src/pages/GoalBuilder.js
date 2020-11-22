@@ -19,13 +19,15 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import ListGroup from 'react-bootstrap/ListGroup';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Accordion from 'react-bootstrap/Accordion';
+import Tabs from 'react-bootstrap/Tabs';
+import Tab from 'react-bootstrap/Tab';
 import { v4 as uuidv4} from 'uuid';
 
 import MtNavbar from '../components/MtNavbar.js';
-import CreateTaskModal from '../components/CreateTaskModal.js';
-import EditTaskModal from '../components/EditTaskModal.js';
-import EditSubTaskModal from '../components/EditSubTaskModal.js';
-import DeleteModal from '../components/DeleteModal.js';
+import CreateTaskModal from '../components/Goal/CreateTaskModal.js';
+import EditTaskModal from '../components/Goal/EditTaskModal.js';
+import EditSubTaskModal from '../components/Goal/EditSubTaskModal.js';
+import DeleteModal from '../components/Goal/DeleteModal.js';
 
 const DB = require('../controller/db.js');
 const GOALMODEL = require('../models/goal.js');
@@ -551,17 +553,14 @@ function GoalBuilder(props) {
 						</Row>
 					</Col>
 					<Col lg = {8}>
-						<Card>
-							<Card.Header> Chat Room </Card.Header>
-							<Card.Body>
-								<Card.Title>
-									*in progress!*
-								</Card.Title>
-							</Card.Body>
-							<Card.Footer>
-								<small> Last Active: </small>
-							</Card.Footer>
-						</Card>
+						<Tabs defaultActiveKey = "chat" id = "goalTabs">
+							<Tab eventKey = "chat" title = "Chat">
+							</Tab>
+							<Tab eventKey = "analytics" title = "Analytics">
+							</Tab>
+							<Tab eventKey = "timeline" title = "Timeline">
+							</Tab>
+						</Tabs>
 					</Col>
 				</Row>
 				<br/>
