@@ -200,7 +200,17 @@ function GoalBuilder(props) {
 		else {
 			task.subTasks[index].dateCompleted = "";
 		}
+		task.percentageCompleted = calculateTaskPercentageCompleted(task);
+		goal.percentageCompleted = calculateGoalPercentageCompleted();
 		DB.writeOne(task.taskId, task, "tasks",
+			function(res, data) {
+				return;
+			},
+			function(error) {
+				alert(error.toString());
+			}
+		);
+		DB.writeOne(ID, goal, "goals",
 			function(res, data) {
 				return;
 			},
@@ -243,12 +253,12 @@ function GoalBuilder(props) {
 		}
 	}
 
-	function calculateTaskPercentageCompleted(goalCopy, taskIndex) {
+	function calculateTaskPercentageCompleted(task) {
 		var percentageCompleted = 0;
 		var numSubsCompleted = 0;
-		var totalSubs = goalCopy.tasks[taskIndex].subTasks.length;
+		var totalSubs = task.subTasks.length;
 		for(var i = 0; i < totalSubs; i++) {
-			var sub = goalCopy.tasks[taskIndex].subTasks[i];
+			var sub = task.subTasks[i];
 			if(sub.dateCompleted.toString().trim().length !== 0) {
 				numSubsCompleted++;
 			}
@@ -257,12 +267,12 @@ function GoalBuilder(props) {
 		return percentageCompleted;
 	}
 
-	function calculateGoalPercentageCompleted(goalCopy) {
+	function calculateGoalPercentageCompleted() {
 		var percentageCompleted = 0;
 		var numSubsCompleted = 0;
 		var totalSubs = 0;
-		for(var i = 0; i < goalCopy.tasks.length; i++) {
-			var task = goalCopy.tasks[i];
+		for(var i = 0; i < tasks.length; i++) {
+			var task = tasks[i];
 			for(var j = 0; j < task.subTasks.length; j++) {
 				if(task.subTasks[j].dateCompleted.toString().trim().length !== 0) {
 					numSubsCompleted++;
@@ -633,7 +643,7 @@ function GoalBuilder(props) {
 																					type = "checkbox"
 																					style = {{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}
 																					label = {sub.name}
-																					onChange = {() => completeSub(index, subIndex)}
+																					onChange = {() => checkSub(task, subIndex)}
 																				/>
 																		</Col>
 																		<Col xs = {4} style = {{textAlign: "right"}}>
@@ -697,9 +707,9 @@ function GoalBuilder(props) {
 																			<Form.Check
 																				type = "checkbox"
 																				style = {{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}
-																				label = {<strike> {goal.tasks[index].subTasks[subIndex].name} </strike>}
+																				label = {<strike> {tasks[index].subTasks[subIndex].name} </strike>}
 																				checked = {true}
-																				onChange = {() => uncompleteSub(index, subIndex)}
+																				onChange = {() => checkSub(task, subIndex)}
 																			/>
 																		);
 																	})}
