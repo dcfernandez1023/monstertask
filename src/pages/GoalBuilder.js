@@ -24,7 +24,7 @@ import { v4 as uuidv4} from 'uuid';
 import MtNavbar from '../components/MtNavbar.js';
 import CreateTaskModal from '../components/CreateTaskModal.js';
 import EditTaskModal from '../components/EditTaskModal.js';
-import SubTaskModal from '../components/SubTaskModal.js';
+import EditSubTaskModal from '../components/EditSubTaskModal.js';
 import DeleteModal from '../components/DeleteModal.js';
 
 const DB = require('../controller/db.js');
@@ -58,10 +58,10 @@ function GoalBuilder(props) {
 
 	const[subShow, setSubShow] = useState(false);
 	const[newSub, setNewSub] = useState();
-	const[newSubIndex, setNewSubIndex] = useState(-1);
+	const[newSubTaskId, setNewSubTaskId] = useState("");
 	const[subToEdit, setSubToEdit] = useState();
+	const[subIndexToEdit, setSubIndexToEdit] = useState(-1);
 	const[subIndexToDelete, setSubIndexToDelete] = useState(-1);
-	const[subToEditLocation, setSubToEditLocation] = useState({taskIndex: -1, subIndex: -1});
 
 	const[deleteSubShow, setDeleteSubShow] = useState(false);
 	const[deleteModalTitle, setDeleteModalTitle] = useState();
@@ -151,10 +151,10 @@ function GoalBuilder(props) {
 
 	//SUB-TASK FUNCTIONS
 
-	function createSub(task, sub) {
-		sub.dateCreated = new Date().toLocaleDateString();
+	function createSub(task) {
+		newSub.dateCreated = new Date().toLocaleDateString();
 		task.lastUpdated = new Date().toLocaleDateString();
-		task.subTasks.push(sub);
+		task.subTasks.push(newSub);
 		DB.writeOne(task.taskId, task, "tasks",
 			function(res, data) {
 				return;
@@ -163,6 +163,7 @@ function GoalBuilder(props) {
 				alert(error.toString());
 			}
 		);
+		setNewSub(props.subTaskModel);
 	}
 
 	function editSub(task, sub, index) {
@@ -410,9 +411,9 @@ function GoalBuilder(props) {
 		);
 	}
 
-	function onClickYes(deleteType, task) {
+	function onClickYes(deleteType, task, index) {
 		if(deleteType === "subTask") {
-			return;
+			deleteSub(task, index);
 		}
 		else if(deleteType === "task") {
 			deleteTask2(task.taskId);
@@ -450,14 +451,15 @@ function GoalBuilder(props) {
 				editTask = {editTask}
 				taskFields = {props.taskFields}
 			/>
-			<SubTaskModal
+			<EditSubTaskModal
 				show = {subShow}
 				setShow = {setSubShow}
 				sub = {subToEdit}
+				subIndexToEdit = {subIndexToEdit}
+				taskToEdit = {taskToEdit}
+				setTaskToEdit = {setTaskToEdit}
 				fields = {props.subTaskFields}
-				subLocation = {subToEditLocation}
-				setSubLocation = {setSubToEditLocation}
-				editSub = {editSubTask}
+				editSub = {editSub}
 			/>
 			<DeleteModal
 				show = {deleteSubShow}
@@ -651,10 +653,9 @@ function GoalBuilder(props) {
 																				style = {{marginTop: "5%"}}
 																				onClick = {() => {
 																					setSubShow(true);
+																					setTaskToEdit(task);
 																					setSubToEdit(sub);
-																					var copy = subToEditLocation;
-																					copy.taskIndex = index;
-																					copy.subIndex = subIndex;
+																					setSubIndexToEdit(subIndex);
 																				}}
 																			>
 																				✏️
@@ -714,7 +715,7 @@ function GoalBuilder(props) {
 													<div></div>
 													:
 													<div>
-													{newSubIndex === index ?
+													{newSubTaskId === task.taskId ?
 														<Row>
 															<Col>
 																<Row>
@@ -773,7 +774,7 @@ function GoalBuilder(props) {
 																	<Col>
 																		<Button variant = "light" size = "sm" style = {{float: "right", margin: "1%"}} onClick = {() => {
 																																setNewSub(props.subTaskModel);
-																																setNewSubIndex(-1);
+																																setNewSubTaskId("");
 																															}}
 																		>
 																			❌
@@ -782,9 +783,8 @@ function GoalBuilder(props) {
 																	<Col>
 																		{/*TODO: make this check mark button save the subtask as well */}
 																		<Button variant = "light" size = "sm" style = {{float: "left", margin: "1%"}} onClick = {() => {
-																																addSubTask(index)
-																																setNewSub(props.subTaskModel);
-																																setNewSubIndex(-1);
+																																createSub(task);
+																																setNewSubTaskId("");
 																															}}
 																		>
 																			✔️
@@ -797,8 +797,7 @@ function GoalBuilder(props) {
 														<Row>
 															<Col>
 																<Button variant = "light" style = {{width: "100%"}} onClick = {() => {
-																														setNewSubIndex(index);
-																														//setTask(props.taskModel);
+																														setNewSubTaskId(task.taskId);
 																													}}
 																>
 																	+ Add Sub-task

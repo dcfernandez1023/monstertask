@@ -7,26 +7,23 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 
-function SubTaskModal(props) {
-	
+function EditSubTaskModal(props) {
+
 	const[fields, setFields] = useState([]);
 	const[show, setShow] = useState(false);
 	const[sub, setSub] = useState(null);
-	const[subLocation, setSubLocation] = useState();
-	
+
 	useEffect(() => {
 		setFields(props.fields.editableFields);
 		setShow(props.show);
 		setSub(props.sub);
-		setSubLocation(props.subLocation);
 	}, [props.show, props.sub, props.fields, props.subLocation]);
-	
+
 	function handleClose() {
 		props.setShow(!props.show);
-		props.setSubLocation({taskIndex: -1, subIndex: -1});
 		setSub(null);
 	}
-	
+
 	function onChangeInput(e) {
 		const name = [e.target.name][0];
 		const value = e.target.value;
@@ -34,7 +31,7 @@ function SubTaskModal(props) {
 		copy[name] = value;
 		setSub(copy);
 	}
-	
+
 	return (
 		<Modal
 			show = {show}
@@ -46,14 +43,14 @@ function SubTaskModal(props) {
 				<Modal.Title> Edit Sub-task </Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-			{sub !== undefined && sub !== null && fields !== null && fields !== undefined && subLocation !== undefined && subLocation !== null ?
+			{sub !== undefined && sub !== null && fields !== null && fields !== undefined ?
 				fields.map((field) => {
 					return (
 						<Row>
 							<Col>
 								<Form.Label> {field.displayName} </Form.Label>
-								<Form.Control 
-									as = "input" 
+								<Form.Control
+									as = "input"
 									name = {field.value}
 									value = {sub[field.value]}
 									onChange = {(e) => onChangeInput(e)}
@@ -68,16 +65,15 @@ function SubTaskModal(props) {
 			</Modal.Body>
 			<Modal.Footer>
 				<Button variant = "primary" onClick = {() => {
-														props.editSub(sub, subLocation.taskIndex, subLocation.subIndex);
-														props.setSubLocation({taskIndex: -1, subIndex: -1});
+														props.editSub(props.taskToEdit, sub, props.subIndexToEdit);
 														handleClose();
 													}}
-				> 
-					Done 
+				>
+					Done
 				</Button>
 			</Modal.Footer>
 		</Modal>
 	);
 }
 
-export default SubTaskModal;
+export default EditSubTaskModal;
